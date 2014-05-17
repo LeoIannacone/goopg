@@ -27,7 +27,9 @@ def verify(data):
     else:
         result = gpg.verify(data).__dict__
     del(result['gpg'])
-    return toJSON(result, indent=4)
+    if result['key_id'] is None:
+        result['data'] = data
+    return toJSON(result)
 
 
 def messageFromSignature(signature):
@@ -38,8 +40,8 @@ def messageFromSignature(signature):
     return message
 
 
-if __name__ == '__main__':
-    print(verify(open('../nosign.txt', 'rb').read()))
-    print(verify(open('../sign.inline.txt', 'rb').read()))
-    print(verify(open('../sign.attached.txt', 'rb').read()))
-    print(verify(open('../sign.attached2.txt', 'rb').read()))
+# if __name__ == '__main__':
+#     print(verify(open('../nosign.txt', 'rb').read()))
+#     print(verify(open('../sign.inline.txt', 'rb').read()))
+#     print(verify(open('../sign.attached.txt', 'rb').read()))
+#     print(verify(open('../sign.attached2.txt', 'rb').read()))
