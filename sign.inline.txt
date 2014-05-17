@@ -1,0 +1,125 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: leo.iannacone@gmail.com
+Received: by 10.170.121.4 with SMTP id n4csp27788ykb;
+        Thu, 15 May 2014 08:06:12 -0700 (PDT)
+X-Received: by 10.60.124.227 with SMTP id ml3mr10530655oeb.67.1400166372388;
+        Thu, 15 May 2014 08:06:12 -0700 (PDT)
+Return-Path: <bounce-debian-newmaint=l3on=ubuntu.com@lists.debian.org>
+Received: from fiordland.canonical.com (fiordland.canonical.com. [91.189.94.145])
+        by mx.google.com with ESMTP id c10si3325103oed.55.2014.05.15.08.06.11
+        for <leo.iannacone@gmail.com>;
+        Thu, 15 May 2014 08:06:12 -0700 (PDT)
+Received-SPF: neutral (google.com: 91.189.94.145 is neither permitted nor denied by manual fallback record for domain of bounce-debian-newmaint=l3on=ubuntu.com@lists.debian.org) client-ip=91.189.94.145;
+Authentication-Results: mx.google.com;
+       spf=neutral (google.com: 91.189.94.145 is neither permitted nor denied by manual fallback record for domain of bounce-debian-newmaint=l3on=ubuntu.com@lists.debian.org) smtp.mail=bounce-debian-newmaint=l3on=ubuntu.com@lists.debian.org
+Received: from bendel.debian.org (bendel.debian.org [82.195.75.100])
+	by fiordland.canonical.com (Postfix) with ESMTP id 6A865A18270
+	for <l3on@ubuntu.com>; Thu, 15 May 2014 15:06:11 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by bendel.debian.org (Postfix) with QMQP
+	id 58FF8307; Thu, 15 May 2014 15:06:10 +0000 (UTC)
+Old-Return-Path: <alessio@coccia.debian.org>
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on bendel.debian.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-4.0 required=4.0 tests=DIGITS_LETTERS,
+	FVGT_m_MULTI_ODD,PGPSIGNATURE,T_RP_MATCHES_RCVD autolearn=no version=3.3.2
+X-Original-To: lists-debian-newmaint@bendel.debian.org
+Delivered-To: lists-debian-newmaint@bendel.debian.org
+Received: from localhost (localhost [127.0.0.1])
+	by bendel.debian.org (Postfix) with ESMTP id B8BDA6A7
+	for <lists-debian-newmaint@bendel.debian.org>; Thu, 15 May 2014 14:48:21 +0000 (UTC)
+X-Virus-Scanned: at lists.debian.org with policy bank en-lt
+X-Amavis-Spam-Status: No, score=-5.99 tagged_above=-10000 required=5.3
+	tests=[BAYES_00=-2, DIGITS_LETTERS=1, FVGT_m_MULTI_ODD=0.02,
+	PGPSIGNATURE=-5, T_RP_MATCHES_RCVD=-0.01] autolearn=no
+Received: from bendel.debian.org ([127.0.0.1])
+	by localhost (lists.debian.org [127.0.0.1]) (amavisd-new, port 2525)
+	with ESMTP id fylaSVsfAjh6
+	for <lists-debian-newmaint@bendel.debian.org>;
+	Thu, 15 May 2014 14:48:17 +0000 (UTC)
+Received: from mailly.debian.org (mailly.debian.org [IPv6:2001:41b8:202:deb:6564:a62:52c3:4b72])
+	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+	(Client CN "mailly.debian.org", Issuer "Debian SMTP CA" (not verified))
+	by bendel.debian.org (Postfix) with ESMTPS id 08113302
+	for <debian-newmaint@lists.debian.org>; Thu, 15 May 2014 14:48:16 +0000 (UTC)
+Received: from coccia.debian.org ([2001:41c8:1000:21::21:11])
+	from C=NA,ST=NA,L=Ankh Morpork,O=Debian SMTP,OU=Debian SMTP CA,CN=coccia.debian.org,EMAIL=hostmaster@coccia.debian.org (verified)
+	by mailly.debian.org with esmtps (TLS1.2:DHE_RSA_AES_128_CBC_SHA1:128)
+	(Exim 4.80)
+	(envelope-from <alessio@coccia.debian.org>)
+	id 1WkwxC-0004zU-QX
+	for debian-newmaint@lists.debian.org; Thu, 15 May 2014 14:48:14 +0000
+Received: from alessio by coccia.debian.org with local (Exim 4.80)
+	(envelope-from <alessio@coccia.debian.org>)
+	id 1WkwxC-0003LM-7j
+	for debian-newmaint@lists.debian.org; Thu, 15 May 2014 14:48:14 +0000
+To: debian-newmaint@lists.debian.org
+Subject: Re: DM application of Leo Iannacone
+Message-Id: <E1WkwxC-0003LM-7j@coccia.debian.org>
+From: Alessio Treglia <alessio@coccia.debian.org>
+Date: Thu, 15 May 2014 14:48:14 +0000
+X-Rc-Spam: 2008-11-04_01
+X-Rc-Virus: 2007-09-13_01
+X-Rc-Spam: 2008-11-04_01
+Resent-Message-ID: <CzZ_SKWp0AI.A.67B.ifNdTB@bendel>
+Resent-From: debian-newmaint@lists.debian.org
+X-Mailing-List: <debian-newmaint@lists.debian.org> archive/latest/7653
+X-Loop: debian-newmaint@lists.debian.org
+List-Id: <debian-newmaint.lists.debian.org>
+List-URL: <http://lists.debian.org/debian-newmaint/>
+List-Post: <mailto:debian-newmaint@lists.debian.org>
+List-Help: <mailto:debian-newmaint-request@lists.debian.org?subject=help>
+List-Subscribe: <mailto:debian-newmaint-request@lists.debian.org?subject=subscribe>
+List-Unsubscribe: <mailto:debian-newmaint-request@lists.debian.org?subject=unsubscribe>
+Precedence: list
+Resent-Sender: debian-newmaint-request@lists.debian.org
+Resent-Date: Thu, 15 May 2014 15:06:10 +0000 (UTC)
+
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+(This is properly signed)
+
+Hello,
+
+I reviewed and sponsored many, many Leo's packages, he's an
+collaborative guy, focused on details and extremely knowledgeable
+about Debian's tools and procedures.
+I am so happy to see him showing his interest in becoming Debian
+Maintainer, I'm sure he'd be a great addition to the project as DM now
+(and as DD - in the near future hopefully).
+
+Please accept Leo as DM.
+
+Regards.
+
+- -- 
+Alessio Treglia          | www.alessiotreglia.com
+Debian Developer         |     alessio@debian.org
+Ubuntu Core Developer    |  quadrispro@ubuntu.com
+0416 0004 A827 6E40 BB98 90FB E8A4 8AE5 311D 765A
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCgAGBQJTdNNgAAoJEOikiuUxHXZaSsQP/Ru7jQw2ihA4oge4FKx2Sxb1
+hUMIhevVLmILYJv4rcAM2Oovuy1ouGRxfCOm+oedjd/6jv540iCkil6SJKEGFNiQ
+8c8Ot+q4ldqpc2pg5E/+ctmtImchoFJFunWD77qB2yU58iVwy4/5aUyh6MA2YAik
+1ArOtIhgMybOHAU4UoHN/iFbx4aJStmXkRNamciC/6N4102dVN7xUC2WPGYg27Yd
+jZJlYbq4fnWkkC/VK8pFKR5Mddw/jMg5R8HQmu5Ckk7j9zW6Ao7KfdrACtTxC1QW
+ZHi1aSqaUecwURm3gj1X0h557fhl6B1apC4iqONUQyYFrBQHZ1YxAoNf2EADTgmg
+pUjHVzl26AcKC1txxmJur0+avYnZoPhPm8IIdzSBhtr/lL3SEw8O7Y5IdJ1coQg2
+ZW8kLbY1yM5+sjf5dvQDfISX1+QsRpvnkrGO3bv30oE0sYlMpN6EEvcfXUrMfcbP
+2ZxlXltfwYCOBKmkB0qEYpmrZo4vhavy7sY7DpXYEiWfQm+xaKavVurXrx324iV1
+V35Q+srKBgPOpT1HVLT+MUwUVbC443Tn0dzzSPTT/watn3bd/beVKGvAIeU6nQ1W
+4NDoomMYBl1ozHgmu1NDcRndzvvTZiR9VAsHdqMxgGh+1IlQO+nngNDB5mpFlfUR
+5RF1tiTIc4MHAwJBY5vS
+=nROJ
+-----END PGP SIGNATURE-----
+
+
+-- 
+To UNSUBSCRIBE, email to debian-newmaint-REQUEST@lists.debian.org
+with a subject of "unsubscribe". Trouble? Contact listmaster@lists.debian.org
+Archive: https://lists.debian.org/E1WkwxC-0003LM-7j@coccia.debian.org
+
