@@ -12,13 +12,14 @@
     ],
 
     "content_scripts": [{
-        "matches": ["https://mail.google.com/*",
+        "matches": [
+            "https://mail.google.com/*",
             "http://mail.google.com/*"
         ],
-        "js": ["inject.js"]
+        "js": ["inject.js", "goopg.js"]
     }],
 
     "web_accessible_resources": [
-        "goopg.js"
+        "goopg-web.js"
     ]
 }

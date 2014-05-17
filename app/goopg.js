@@ -4,7 +4,7 @@ GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked"
 function get_orig_message(id) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
-    var auth = GLOBALS[9];
+    var auth = document.getElementById('goopg').innerHTML;
     url = "https://mail.google.com/mail/u/0/?ui=2&ik=" + auth + "&view=om&th=" + id
     xmlHttp.open("GET", url, false);
     xmlHttp.send(null);
@@ -13,10 +13,16 @@ function get_orig_message(id) {
 
 function check_message(id) {
     console.log(get_orig_message(id))
+    // info = {}
+    // info.id = id
+    // info.message = get_orig_message(id)
+    // chrome.runtime.sendNativeMessage('com.leoiannacone.goopg', info.message,
+    //     function(response) {
+    //         console.log("Received " + response);
+    //     });
 }
 
 function look_for_messages() {
-    console.log('Triggg')
     messages = document.getElementsByClassName('ii');
     for (var i = 0; i < messages.length; i++) {
         var id = null;
@@ -34,5 +40,13 @@ function look_for_messages() {
             check_message(id)
     }
 }
+
+// var divs = document.getElementsByTagName('div')
+// for (var i = 0; i < divs.length; i++) {
+//     if (divs[i].getAttribute('role') == 'main') {
+//         divs[i].addEventListener('DOMSubtreeModified', look_for_messages, false);
+//         break;
+//     }
+// }
 
 document.body.addEventListener('DOMSubtreeModified', look_for_messages, false);
