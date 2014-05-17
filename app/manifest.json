@@ -8,16 +8,25 @@
     "permissions": [
         "https://mail.google.com/*",
         "http://mail.google.com/*",
+        "background",
         "nativeMessaging"
     ],
+
+    "background": {
+        "scripts": ["goopg.js"]
+    },
 
     "content_scripts": [{
         "matches": [
             "https://mail.google.com/*",
             "http://mail.google.com/*"
         ],
-        "js": ["inject.js", "goopg.js"]
+        "js": ["inject.js"]
     }],
+
+    "externally_connectable": {
+        "matches": ["*://mail.google.com/*"]
+    },
 
     "web_accessible_resources": [
         "goopg-web.js"
