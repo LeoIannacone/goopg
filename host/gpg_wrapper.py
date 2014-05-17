@@ -30,7 +30,7 @@ def verify(data):
         del(result['gpg'])
     if 'key_id' in result and result['key_id'] is None:
         result['data'] = data
-    return toJSON(result)
+    return result
 
 
 def messageFromSignature(signature):

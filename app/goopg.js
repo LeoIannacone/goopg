@@ -19,7 +19,9 @@ port.onDisconnect.addListener(function() {
 
 chrome.runtime.onMessageExternal.addListener(
     function(request, sender, sendResponse) {
-        hash = utf8_to_b64(request.message)
+        full_message = "X-GM-MSGID: " + request.id + "\n"
+        full_message += request.message
+        hash = utf8_to_b64(full_message)
         console.log("Recevided request for", request.id, "data length", hash.length)
         port.postMessage(hash)
     }

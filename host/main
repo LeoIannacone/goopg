@@ -74,7 +74,9 @@ def read_thread_func():
         open('/tmp/clean', 'w').write(text)
 
         # In headless mode just send an echo message back.
-        send_message(gpg_wrapper.verify(text))
+        verified = gpg_wrapper.verify(text)
+        verified['id'] = text.split('\n')[0].replace('X-GM-MSGID:', '').strip()
+        send_message(json.dumps(verified))
         # send_debug(text)
 
 
