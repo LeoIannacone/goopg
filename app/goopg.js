@@ -6,23 +6,35 @@ function b64_to_utf8(str) {
     return unescape(decodeURIComponent(window.atob(str)));
 }
 
-var port = chrome.runtime.connectNative("com.leoiannacone.goopg");
-port.onMessage.addListener(function(msg) {
+var lastSendResponse;
+
+function sendResponseToWeb(response) {
+    console.log("Sending to web", response)
+    lastSendResponse(response);
+}
+
+var web_port = null;
+var py_port = chrome.runtime.connectNative("com.leoiannacone.goopg");
+
+py_port.onMessage.addListener(function(msg) {
     console.log("Received ", msg);
-    if (msg['debug'])
-        console.log(msg['debug'])
+    if (web_port != null)
+        web_port.postMessage(msg)
+    else
+        console.log("web port is null")
 });
 
-port.onDisconnect.addListener(function() {
+py_port.onDisconnect.addListener(function() {
     console.log("Failed to connect: " + chrome.runtime.lastError.message);
 });
 
-chrome.runtime.onMessageExternal.addListener(
-    function(request, sender, sendResponse) {
+chrome.runtime.onConnectExternal.addListener(function(my_web_port) {
+    web_port = my_web_port;
+    web_port.onMessage.addListener(function(request) {
         full_message = "X-GM-MSGID: " + request.id + "\n"
         full_message += request.message
         hash = utf8_to_b64(full_message)
         console.log("Recevided request for", request.id, "data length", hash.length)
-        port.postMessage(hash)
-    }
-);
+        py_port.postMessage(hash)
+    });
+});

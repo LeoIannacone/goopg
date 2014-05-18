@@ -1,6 +1,17 @@
 GOOPG_CLASS_PREFIX = "goopg-"
 GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked"
 
+var goopgExtensionId = "ddlebbablilfigfkkjedbpapjichmjgd";
+var port = chrome.runtime.connect(goopgExtensionId);
+
+port.onDisconnect.addListener(function() {
+    console.log("Failed to connect: " + chrome.runtime.lastError.message);
+});
+
+port.onMessage.addListener(function(msg) {
+    console.log("Received", msg);
+});
+
 function get_orig_message(id) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
@@ -15,10 +26,7 @@ function check_message(id) {
     info = {}
     info.id = id
     info.message = get_orig_message(id)
-    chrome.runtime.sendMessage('ddlebbablilfigfkkjedbpapjichmjgd', info,
-        function(response) {
-            console.log("Received " + response);
-        });
+    port.postMessage(info)
 }
 
 function look_for_messages() {
