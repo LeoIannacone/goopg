@@ -5,7 +5,6 @@ function get_orig_message(id) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     var auth = GLOBALS[9];
-    console.log(auth)
     url = "https://mail.google.com/mail/u/0/?ui=2&ik=" + auth + "&view=om&th=" + id
     xmlHttp.open("GET", url, false);
     xmlHttp.send(null);
@@ -40,13 +39,5 @@ function look_for_messages() {
             check_message(id)
     }
 }
-
-// var divs = document.getElementsByTagName('div')
-// for (var i = 0; i < divs.length; i++) {
-//     if (divs[i].getAttribute('role') == 'main') {
-//         divs[i].addEventListener('DOMSubtreeModified', look_for_messages, false);
-//         break;
-//     }
-// }
 
 document.body.addEventListener('DOMSubtreeModified', look_for_messages, false);

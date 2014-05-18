@@ -17,9 +17,10 @@
     },
 
     "content_scripts": [{
-        "matches": [
-            "https://mail.google.com/*",
-            "http://mail.google.com/*"
+        "matches": ["*://mail.google.com/*"],
+        "css": [
+            "lib/css/goopg-bootstrap.css",
+            "lib/css/goopg-web.css"
         ],
         "js": ["inject.js"]
     }],
