@@ -31,6 +31,10 @@ function showGPGstdErr(div) {
     toggleDisplay(div.parentElement.getElementsByClassName('gpgStdErr')[0])
 }
 
+function build_body(body) {
+    return body
+}
+
 function build_alert(msg) {
     var className;
     var text;
@@ -48,7 +52,7 @@ function build_alert(msg) {
         text = msg.username + " " + msg.stderr.match(/using .* key ID (.*)/)[0]
     }
     // clean stderr
-    var stderr = msg.stderr.replace(/^.GNU.*\n?/mg, '');
+    var stderr = msg.stderr.replace(/^.GNUPG:.*\n?/mg, '');
     var result = document.createElement('div');
     result.className = "goopg";
     result.innerHTML = '<div class="alert alert-' + className + '">' +
@@ -78,7 +82,7 @@ port.onMessage.addListener(function(msg) {
     div.insertBefore(build_alert(msg), div.firstChild);
     // var body = document.createElement('div')
     // body.className = "raw"
-    // body.innerHTML = escapeHtml(msg.data)
+    // body.innerHTML = build_body(escapeHtml(msg.data))
     // div.appendChild(body)
 });
 

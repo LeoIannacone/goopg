@@ -11,10 +11,10 @@
 }
 
 .goopg .alert .raw {
-    font-family: courier, monospace;
     margin: 6px 10px 0px;
 }
 
 .raw {
+    font-family: courier, monospace;
     white-space: pre-wrap;
 }

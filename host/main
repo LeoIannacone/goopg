@@ -69,8 +69,6 @@ def read_thread_func():
         verified = gpg_wrapper.verify(text)
         verified['id'] = text.split('\n')[0].replace('X-GM-MSGID:', '').strip()
         send_message(json.dumps(verified))
-        # send_debug(text)
-
 
 if __name__ == '__main__':
     read_thread_func()
