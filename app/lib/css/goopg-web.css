@@ -1,9 +1,10 @@
 .goopg .alert {
     padding: 10px;
     margin-bottom: 15px;
+    cursor: pointer;
 }
 
-.goopg .alert a.btn {
+.goopg .alert span {
     padding: 0;
     margin: 0;
     font-size: 140%;

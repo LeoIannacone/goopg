@@ -70,16 +70,19 @@ function clean_body(body) {
 function build_alert(msg) {
     var className;
     var text;
-    var extra_button = '';
+    var icon;
     if (msg.status == null)
         return;
     else if (msg.status == "no public key") {
+        icon = "question-sign";
         className = "warning";
         text = "public key " + msg.stderr.match(/using .* key ID (.*)/)[1] + " not found"
     } else if (msg.status == "signature valid") {
+        icon = "ok-sign";
         className = "success";
         text = msg.username + " " + msg.stderr.match(/using .* key ID (.*)/)[0]
     } else { // (msg.status == "signature bad")
+        icon = "exclamation-sign";
         className = "danger";
         text = msg.username + " " + msg.stderr.match(/using .* key ID (.*)/)[0]
     }
@@ -87,9 +90,8 @@ function build_alert(msg) {
     var stderr = msg.stderr.replace(/^.GNUPG:.*\n?/mg, '');
     var result = document.createElement('div');
     result.className = "goopg";
-    result.innerHTML = '<div class="alert alert-' + className + '">' +
-        '<a onclick="showGPGstdErr(this)" class="btn btn-link alert-link pull-right">' +
-        '<span class="glyphicon glyphicon glyphicon-info-sign"></span></a>' +
+    result.innerHTML = '<div onclick="showGPGstdErr(this)" class="alert alert-' + className + '">' +
+        '<span class="pull-right glyphicon glyphicon glyphicon-' + icon + '"></span>' +
         '<strong>' + msg.status.capitalize() + ':</strong> ' + escapeHtml(text) +
         '<div class="gpgStdErr raw" style="display:none;">' + escapeHtml(stderr) + '</div>' +
         '</div>';
