@@ -7,7 +7,11 @@ function b64_to_utf8(str) {
 }
 
 function python_utf8_wa(json) {
-    return JSON.parse(decodeURIComponent(escape(JSON.stringify(json))))
+    try {
+        return JSON.parse(decodeURIComponent(escape(JSON.stringify(json))))
+    } catch (err) {
+        return json
+    }
 }
 
 var lastSendResponse;

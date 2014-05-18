@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from gnupg import GPG
-from json import dumps as toJSON
 import email
 import gpgmail
 
@@ -17,19 +16,19 @@ def verify(data):
         for verified, contents in gpgmail.signed_parts(message):
             if verified is not None:
                 result = verified.__dict__
-                if not 'data' in result or not result['data']:
-                    result['data'] = contents.get_payload()
-                else:
-                    # get the real content, strip message Headers
-                    msg_tmp = email.message_from_string(result['data'])
-                    result['data'] = msg_tmp.get_payload()
-                break
+                # try:
+                #     result['data'] = contents.get_payload(decode=True)
+                # except:
+                #     # get the real content, strip message Headers
+                #     msg_tmp = email.message_from_string(result['data'])
+                #     result['data'] = msg_tmp.get_payload(decode=True)
+                # break
     else:
         result = gpg.verify(data).__dict__
     if 'gpg' in result:
         del(result['gpg'])
-    if 'key_id' in result and result['key_id'] is None:
-        result['data'] = data
+    # if 'key_id' in result and result['key_id'] is None:
+    #     result['data'] = data
     return result
 
 
