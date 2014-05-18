@@ -18,29 +18,29 @@ function python_utf8_wa(json) {
     }
 }
 
-var lastSendResponse;
+function get_py_port() {
+    console.log("Connecting to py script ...")
+    var py_port = chrome.runtime.connectNative("com.leoiannacone.goopg");
 
-function sendResponseToWeb(response) {
-    console.log("Sending to web", response)
-    lastSendResponse(response);
+    py_port.onMessage.addListener(function(msg) {
+        // workaround for msg utf-8 coming from py
+        msg = python_utf8_wa(msg)
+        console.log("Received ", msg);
+        if (web_port != null)
+            web_port.postMessage(msg)
+        else
+            console.log("web port is null")
+    });
+
+    py_port.onDisconnect.addListener(function() {
+        console.log("Failed to connect: " + chrome.runtime.lastError.message);
+    });
+
+    return py_port;
 }
 
 var web_port = null;
-var py_port = chrome.runtime.connectNative("com.leoiannacone.goopg");
-
-py_port.onMessage.addListener(function(msg) {
-    // workaround for msg utf-8 coming from py
-    msg = python_utf8_wa(msg)
-    console.log("Received ", msg);
-    if (web_port != null)
-        web_port.postMessage(msg)
-    else
-        console.log("web port is null")
-});
-
-py_port.onDisconnect.addListener(function() {
-    console.log("Failed to connect: " + chrome.runtime.lastError.message);
-});
+var py_port = null;
 
 chrome.runtime.onConnectExternal.addListener(function(my_web_port) {
     web_port = my_web_port;
@@ -49,6 +49,12 @@ chrome.runtime.onConnectExternal.addListener(function(my_web_port) {
         full_message += request.message
         hash = utf8_to_b64(full_message)
         console.log("Recevided request for", request.id, "data length", hash.length)
-        py_port.postMessage(hash)
+        try {
+            if (py_port == null)
+                py_port = get_py_port()
+            py_port.postMessage(hash)
+        } catch (err) {
+            py_port = null;
+        }
     });
 });
