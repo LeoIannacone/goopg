@@ -6,6 +6,10 @@ function b64_to_utf8(str) {
     return unescape(decodeURIComponent(window.atob(str)));
 }
 
+function python_utf8_wa(json) {
+    return JSON.parse(decodeURIComponent(escape(JSON.stringify(json))))
+}
+
 var lastSendResponse;
 
 function sendResponseToWeb(response) {
@@ -17,6 +21,8 @@ var web_port = null;
 var py_port = chrome.runtime.connectNative("com.leoiannacone.goopg");
 
 py_port.onMessage.addListener(function(msg) {
+    // workaround for msg utf-8 coming from py
+    msg = python_utf8_wa(msg)
     console.log("Received ", msg);
     if (web_port != null)
         web_port.postMessage(msg)
