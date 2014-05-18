@@ -32,7 +32,39 @@ function showGPGstdErr(div) {
 }
 
 function build_body(body) {
+    // make urls
+    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    body = body.replace(exp, "<a href='$1'>$1</a>");
     return body
+}
+
+function clean_body(body) {
+    var lines = body.split('\n')
+    // remove header
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i]
+        if (line.indexOf('-----BEGIN PGP SIGNED MESSAGE-----') == 0) {
+            j = i
+            while (line != '<br>' && i < lines.length) {
+                line = lines[i++]
+            }
+            lines.splice(j, i - j);
+            break;
+        }
+    }
+    // remove inline sign
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i]
+        if (line.indexOf('-----BEGIN PGP SIGNATURE-----') == 0) {
+            j = i
+            while (line.indexOf('-----END PGP SIGNATURE-----') < 0 && i < lines.length) {
+                line = lines[i++]
+            }
+            lines.splice(j, i - j);
+            break;
+        }
+    }
+    return lines.join('\n');
 }
 
 function build_alert(msg) {
@@ -79,6 +111,7 @@ port.onMessage.addListener(function(msg) {
     var div = document.getElementsByClassName("m" + msg.id)[0]
     // for (var i = 0; i < div.children.length; i++)
     //     div.children[i].style.display = "none";
+    div.children[0].innerHTML = clean_body(div.children[0].innerHTML)
     div.insertBefore(build_alert(msg), div.firstChild);
     // var body = document.createElement('div')
     // body.className = "raw"
