@@ -30,6 +30,10 @@
     },
 
     "web_accessible_resources": [
-        "goopg-web.js"
+        "goopg-web.js",
+        "lib/fonts/glyphicons-halflings-regular.eot",
+        "lib/fonts/glyphicons-halflings-regular.svg",
+        "lib/fonts/glyphicons-halflings-regular.ttf",
+        "lib/fonts/glyphicons-halflings-regular.woff"
     ]
 }
