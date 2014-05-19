@@ -1,8 +1,11 @@
 GOOPG_CLASS_PREFIX = "goopg-"
 GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked"
 
+GOOGLE_CLASS_MESSAGE = 'ii'
+GOOGLE_CLASS_CONTROLS = 'IZ'
+
 function escapeHtml(string) {
-    return String(string).replace(/[&<>"'\/]/g, function(s) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
         return {
             "&": "&amp;",
             "<": "&lt;",
@@ -14,8 +17,8 @@ function escapeHtml(string) {
     });
 }
 
-String.prototype.capitalize = function() {
-    return this.replace(/(?:^|\s)\S/g, function(a) {
+String.prototype.capitalize = function () {
+    return this.replace(/(?:^|\s)\S/g, function (a) {
         return a.toUpperCase();
     });
 };
@@ -102,11 +105,11 @@ function build_alert(msg) {
 var goopgExtensionId = "ddlebbablilfigfkkjedbpapjichmjgd";
 var port = chrome.runtime.connect(goopgExtensionId);
 
-port.onDisconnect.addListener(function() {
+port.onDisconnect.addListener(function () {
     console.log("Failed to connect: " + chrome.runtime.lastError.message);
 });
 
-port.onMessage.addListener(function(msg) {
+port.onMessage.addListener(function (msg) {
     console.log("Received", msg);
     if (msg.status == null)
         return;
@@ -136,11 +139,12 @@ function check_message(id) {
     info.command = "verify"
     info.id = id
     info.message = get_orig_message(id)
-    port.postMessage(info)
+    if (info.message.match(/-+BEGIN PGP SIGNATURE-+/m))
+        port.postMessage(info)
 }
 
 function look_for_messages() {
-    messages = document.getElementsByClassName('ii');
+    messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
     for (var i = 0; i < messages.length; i++) {
         var id = null;
         var classList = messages[i].classList;
