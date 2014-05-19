@@ -34,33 +34,44 @@ function showGPGstdErr(div) {
     toggleDisplay(div.parentElement.getElementsByClassName('gpgStdErr')[0])
 }
 
-function clean_body(body) {
-    var lines = body.split('\n')
-    // remove header
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i]
-        if (line.indexOf('-----BEGIN PGP SIGNED MESSAGE-----') == 0) {
-            j = i
-            while (line != '<br>' && i < lines.length) {
-                line = lines[i++]
-            }
-            lines.splice(j, i - j);
-            break;
+function hide_signature(div, iterations) {
+    if (!iterations)
+        iterations = 0;
+    body = div.firstChild.innerHTML
+    try {
+        // try to hide inline signature
+        info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m)
+        info = info[info.length - 1]
+        info = info.split(/^-+BEGIN PGP SIGNATURE-+<br>\n/m)[0]
+        if (info.length != div.firstChild.innerHTML.length) {
+            div.firstChild.innerHTML = info
+            return true
         }
-    }
-    // remove inline sign
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i]
-        if (line.indexOf('-----BEGIN PGP SIGNATURE-----') == 0) {
-            j = i
-            while (line.indexOf('-----END PGP SIGNATURE-----') < 0 && i < lines.length) {
-                line = lines[i++]
+        throw ""
+    } catch (err) {
+        // here only if signature is attached
+        var spans = div.parentElement.getElementsByTagName('span');
+        for (var i = 0; i < spans.length; i++) {
+            var span = spans[i];
+            download_url = span.getAttribute('download_url')
+            if (download_url &&
+                download_url.indexOf("text/plain:signature.asc") == 0) {
+                // this is the sign attachment
+                span.style.display = "none";
+                if (span.parentElement.children.length == 2) {
+                    // only one attachment, hide the whole box
+                    span.parentElement.parentElement.style.display = "none"
+                }
+                return true;
             }
-            lines.splice(j, i - j);
-            break;
         }
+        // maaaad try three times at max, then exit
+        if (iterations < 3)
+            setTimeout(function () {
+                hide_signature(div, iterations + 1)
+            }, 250);
     }
-    return lines.join('\n');
+    return false
 }
 
 function build_alert(msg) {
@@ -94,23 +105,6 @@ function build_alert(msg) {
     return result;
 }
 
-function hide_sign_attached(div) {
-    var spans = div.parentElement.getElementsByTagName('span');
-    for (var i = 0; i < spans.length; i++) {
-        var span = spans[i];
-        download_url = span.getAttribute('download_url')
-        if (download_url &&
-            download_url.indexOf("text/plain:signature.asc") == 0) {
-            // this is the sign attachment
-            span.style.display = "none";
-            if (span.parentElement.children.length == 2) {
-                // only one attachment, hide the whole box
-                span.parentElement.parentElement.style.display = "none"
-            }
-            break;
-        }
-    }
-}
 
 
 var web_port = null;
@@ -130,12 +124,7 @@ function get_web_port() {
         if (msg.status == null)
             return;
         var div = document.getElementsByClassName("m" + msg.id)[0]
-        var body = div.children[0].innerHTML
-        var filtered_body = clean_body(body)
-        if (filtered_body.length != body.length)
-            div.children[0].innerHTML = filtered_body
-        else
-            hide_sign_attached(div)
+        hide_signature(div)
         div.insertBefore(build_alert(msg), div.firstChild);
     });
 
