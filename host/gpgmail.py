@@ -81,10 +81,10 @@ def signed_parts(message):
                 for reg in gpg_regex:
                     if not re.compile(reg, re.M).search(payload):
                         raise ValueError
-                    signed_part = re.compile(gpg_regex[0],
-                                             re.M).split(payload)[-1]
-                    signed_part = re.compile(gpg_regex[1],
-                                             re.M).split(signed_part)[0]
-                    yield gpg.verify(payload), signed_part
+                signed_part = re.compile(gpg_regex[0],
+                                         re.M).split(payload)[-1]
+                signed_part = re.compile(gpg_regex[1],
+                                         re.M).split(signed_part)[0]
+                yield gpg.verify(payload), signed_part
             except (ValueError, IndexError):
                 yield gpg.verify(payload), payload
