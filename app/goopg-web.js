@@ -94,6 +94,24 @@ function build_alert(msg) {
     return result;
 }
 
+function hide_sign_attached(div) {
+    var spans = div.parentElement.getElementsByTagName('span');
+    for (var i = 0; i < spans.length; i++) {
+        var span = spans[i];
+        download_url = span.getAttribute('download_url')
+        if (download_url &&
+            download_url.indexOf("text/plain:signature.asc") == 0) {
+            // this is the sign attachment
+            span.style.display = "none";
+            if (span.parentElement.children.length == 2) {
+                // only one attachment, hide the whole box
+                span.parentElement.parentElement.style.display = "none"
+            }
+            break;
+        }
+    }
+}
+
 
 var web_port = null;
 
@@ -116,6 +134,8 @@ function get_web_port() {
         var filtered_body = clean_body(body)
         if (filtered_body.length != body.length)
             div.children[0].innerHTML = filtered_body
+        else
+            hide_sign_attached(div)
         div.insertBefore(build_alert(msg), div.firstChild);
     });
 
