@@ -22,7 +22,7 @@ function get_py_port() {
     console.log("Connecting to py script ...")
     var py_port = chrome.runtime.connectNative("com.leoiannacone.goopg");
 
-    py_port.onMessage.addListener(function(msg) {
+    py_port.onMessage.addListener(function (msg) {
         // workaround for msg utf-8 coming from py
         msg = python_utf8_wa(msg)
         console.log("Received ", msg);
@@ -32,7 +32,7 @@ function get_py_port() {
             console.log("web port is null")
     });
 
-    py_port.onDisconnect.addListener(function() {
+    py_port.onDisconnect.addListener(function () {
         console.log("Failed to connect: " + chrome.runtime.lastError.message);
     });
 
@@ -42,9 +42,9 @@ function get_py_port() {
 var web_port = null;
 var py_port = null;
 
-chrome.runtime.onConnectExternal.addListener(function(my_web_port) {
+chrome.runtime.onConnectExternal.addListener(function (my_web_port) {
     web_port = my_web_port;
-    web_port.onMessage.addListener(function(request) {
+    web_port.onMessage.addListener(function (request) {
         full_message = "X-GM-MSGID: " + request.id + "\n"
         full_message += request.message
         hash = utf8_to_b64(full_message)

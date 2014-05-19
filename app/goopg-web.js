@@ -116,7 +116,10 @@ port.onMessage.addListener(function (msg) {
     var div = document.getElementsByClassName("m" + msg.id)[0]
     // for (var i = 0; i < div.children.length; i++)
     //     div.children[i].style.display = "none";
-    div.children[0].innerHTML = clean_body(div.children[0].innerHTML)
+    var body = div.children[0].innerHTML
+    var filtered_body = clean_body(body)
+    if (filtered_body.length != body.length)
+        div.children[0].innerHTML = filtered_body
     div.insertBefore(build_alert(msg), div.firstChild);
     // var body = document.createElement('div')
     // body.className = "raw"
@@ -124,23 +127,17 @@ port.onMessage.addListener(function (msg) {
     // div.appendChild(body)
 });
 
-function get_orig_message(id) {
-    var xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
+function get_orig_message(id, callback) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+        }
+    }
     var auth = GLOBALS[9];
     url = "https://mail.google.com/mail/u/0/?ui=2&ik=" + auth + "&view=om&th=" + id
     xmlHttp.open("GET", url, false);
     xmlHttp.send(null);
-    return xmlHttp.responseText;
-}
-
-function check_message(id) {
-    info = {}
-    info.command = "verify"
-    info.id = id
-    info.message = get_orig_message(id)
-    if (info.message.match(/-+BEGIN PGP SIGNATURE-+/m))
-        port.postMessage(info)
 }
 
 function look_for_messages() {
@@ -157,8 +154,17 @@ function look_for_messages() {
                 break;
             }
         }
-        if (id)
-            check_message(id)
+        if (id) {
+            get_orig_message(id, function (message) {
+                if (message.match(/-+BEGIN PGP SIGNATURE-+/m)) {
+                    var info = {}
+                    info.command = "verify"
+                    info.id = id
+                    info.message = message
+                    port.postMessage(info)
+                }
+            })
+        }
     }
 }
 
