@@ -34,13 +34,6 @@ function showGPGstdErr(div) {
     toggleDisplay(div.parentElement.getElementsByClassName('gpgStdErr')[0])
 }
 
-function build_body(body) {
-    // make urls
-    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    body = body.replace(exp, "<a href='$1'>$1</a>");
-    return body
-}
-
 function clean_body(body) {
     var lines = body.split('\n')
     // remove header
@@ -102,30 +95,41 @@ function build_alert(msg) {
 }
 
 
-var goopgExtensionId = "ddlebbablilfigfkkjedbpapjichmjgd";
-var port = chrome.runtime.connect(goopgExtensionId);
+var web_port = null;
 
-port.onDisconnect.addListener(function () {
-    console.log("Failed to connect: " + chrome.runtime.lastError.message);
-});
+function get_web_port() {
 
-port.onMessage.addListener(function (msg) {
-    console.log("Received", msg);
-    if (msg.status == null)
-        return;
-    var div = document.getElementsByClassName("m" + msg.id)[0]
-    // for (var i = 0; i < div.children.length; i++)
-    //     div.children[i].style.display = "none";
-    var body = div.children[0].innerHTML
-    var filtered_body = clean_body(body)
-    if (filtered_body.length != body.length)
-        div.children[0].innerHTML = filtered_body
-    div.insertBefore(build_alert(msg), div.firstChild);
-    // var body = document.createElement('div')
-    // body.className = "raw"
-    // body.innerHTML = build_body(escapeHtml(msg.data))
-    // div.appendChild(body)
-});
+    var goopgExtensionId = "ddlebbablilfigfkkjedbpapjichmjgd";
+    console.log("Connecting to web port...")
+    var port = chrome.runtime.connect(goopgExtensionId);
+
+    port.onDisconnect.addListener(function () {
+        console.log("Failed to connect: " + chrome.runtime.lastError.message);
+    });
+
+    port.onMessage.addListener(function (msg) {
+        console.log("Received", msg);
+        if (msg.status == null)
+            return;
+        var div = document.getElementsByClassName("m" + msg.id)[0]
+        var body = div.children[0].innerHTML
+        var filtered_body = clean_body(body)
+        if (filtered_body.length != body.length)
+            div.children[0].innerHTML = filtered_body
+        div.insertBefore(build_alert(msg), div.firstChild);
+    });
+
+    return port;
+}
+
+function send_message_web_port(message) {
+    try {
+        web_port.postMessage(message)
+    } catch (err) {
+        web_port = get_web_port();
+        web_port.postMessage(message)
+    }
+}
 
 function get_orig_message(id, callback) {
     var xmlHttp = new XMLHttpRequest();
@@ -156,12 +160,12 @@ function look_for_messages() {
         }
         if (id) {
             get_orig_message(id, function (message) {
-                if (message.match(/-+BEGIN PGP SIGNATURE-+/m)) {
+                if (message.match(/^-+BEGIN PGP SIGNATURE-+/m)) {
                     var info = {}
                     info.command = "verify"
                     info.id = id
                     info.message = message
-                    port.postMessage(info)
+                    send_message_web_port(info)
                 }
             })
         }

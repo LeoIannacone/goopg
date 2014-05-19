@@ -50,11 +50,10 @@ chrome.runtime.onConnectExternal.addListener(function (my_web_port) {
         hash = utf8_to_b64(full_message)
         console.log("Recevided request for", request.id, "data length", hash.length)
         try {
-            if (py_port == null)
-                py_port = get_py_port()
             py_port.postMessage(hash)
         } catch (err) {
-            py_port = null;
+            py_port = get_py_port();
+            py_port.postMessage(hash);
         }
     });
 });
