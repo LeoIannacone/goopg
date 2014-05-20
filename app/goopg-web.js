@@ -1,6 +1,7 @@
 "use strict";
 var GOOPG_CLASS_PREFIX = "goopg-";
 var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
+var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 
 var GOOGLE_CLASS_MESSAGE = "ii";
 var GOOGLE_CLASS_CONTROLS = "IZ";
@@ -29,10 +30,6 @@ function toggleDisplay(div) {
         div.style.display = "block";
     else
         div.style.display = "none";
-}
-
-function showGPGstdErr(div) {
-    toggleDisplay(div.parentElement.getElementsByClassName("gpgStdErr")[0]);
 }
 
 function hide_signature(div, iterations) {
@@ -98,11 +95,24 @@ function build_alert(msg) {
     var stderr = msg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
     var result = document.createElement("div");
     result.className = "goopg";
-    result.innerHTML = "<div onclick=\"showGPGstdErr(this)\" class=\"alert alert-" + className + "\">" +
+    var alert = document.createElement("div");
+    alert.className = "alert alert-" + className;
+    var alert_header = document.createElement("div");
+    alert_header.className = "alert-header";
+    alert_header.addEventListener("click", function () {
+        toggleDisplay(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
+    });
+    alert_header.innerHTML =
         "<span class=\"pull-right glyphicon glyphicon glyphicon-" + icon + "\"></span>" +
-        "<strong>" + msg.status.capitalize() + ":</strong> " + escapeHtml(text) +
-        "<div class=\"gpgStdErr raw\" style=\"display:none;\">" + escapeHtml(stderr) + "</div>" +
-        "</div>";
+        "<strong>" + msg.status.capitalize() + ":</strong> " + escapeHtml(text);
+    var alert_stderr = document.createElement("div");
+    alert_stderr.className = "raw " + GOOPG_CLASS_STDERR;
+    alert_stderr.style.display = "none";
+    alert_stderr.innerHTML = escapeHtml(stderr);
+
+    alert.appendChild(alert_header);
+    alert.appendChild(alert_stderr);
+    result.appendChild(alert);
     return result;
 }
 

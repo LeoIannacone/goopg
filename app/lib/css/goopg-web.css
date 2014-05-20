@@ -1,6 +1,9 @@
 .goopg .alert {
     padding: 10px;
     margin-bottom: 15px;
+}
+
+.goopg .alert-header {
     cursor: pointer;
 }
 
