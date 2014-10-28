@@ -12,6 +12,8 @@ sys.stderr = open('/tmp/goopg.err', 'a')
 
 def send_message(message):
     """Helper function that sends a message to the webapp."""
+    # Get a json string from the message
+    message = json.dumps(message)
     # Write message size.
     sys.stdout.write(struct.pack('I', len(message)))
     # Write the message itself.
@@ -19,27 +21,31 @@ def send_message(message):
     sys.stdout.flush()
 
 
-def read_thread_func():
+def read_message():
+    """Helper that reads messages from the webapp."""
+    # Read the message length (first 4 bytes).
+    text_length_bytes = sys.stdin.read(4)
+
+    # Unpack message length as 4 byte integer.
+    text_length = struct.unpack('i', text_length_bytes)[0]
+
+    # Read the text (JSON object) of the message.
+    raw_text = sys.stdin.read(text_length).decode('utf-8')
+    return json.loads(raw_text)
+
+
+def main():
     """Thread that reads messages from the webapp."""
     #message_number = 0
     handler = CommandHandler()
     while 1:
-        # Read the message length (first 4 bytes).
-        text_length_bytes = sys.stdin.read(4)
-
-        # Unpack message length as 4 byte integer.
-        text_length = struct.unpack('i', text_length_bytes)[0]
-
-        # Read the text (JSON object) of the message.
-        raw_text = sys.stdin.read(text_length).decode('utf-8')
-        command = json.loads(raw_text)
+        command = read_message()
         result = handler.parse(command)
         if result:
             command['result'] = result
-            command = json.dumps(command)
             send_message(command)
 
 
 if __name__ == '__main__':
-    read_thread_func()
+    main()
     sys.exit(0)
