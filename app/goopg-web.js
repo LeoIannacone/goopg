@@ -32,11 +32,9 @@ function toggleDisplay(div) {
         div.style.display = "none";
 }
 
-function hide_signature(div, iterations) {
-    if (!iterations)
-        iterations = 0;
+function hide_signature(filename, div) {
     var body = div.firstChild.innerHTML;
-    try {
+    if (filename === null) {
         // try to hide inline signature
         var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
         info = info[info.length - 1];
@@ -45,15 +43,14 @@ function hide_signature(div, iterations) {
             div.firstChild.innerHTML = info;
             return true;
         }
-        throw "";
-    } catch (err) {
+    } else {
         // here only if signature is attached
         var spans = div.parentElement.getElementsByTagName("span");
         for (var i = 0; i < spans.length; i++) {
             var span = spans[i];
             var download_url = span.getAttribute("download_url");
             if (download_url &&
-                download_url.indexOf("text/plain:signature.asc") === 0) {
+                download_url.indexOf("text/plain:" + filename) === 0) {
                 // this is the sign attachment
                 span.style.display = "none";
                 if (span.parentElement.children.length == 2) {
@@ -63,11 +60,6 @@ function hide_signature(div, iterations) {
                 return true;
             }
         }
-        // maaaad try three times at max, then exit
-        if (iterations < 3)
-            setTimeout(function () {
-                hide_signature(div, iterations + 1);
-            }, 250);
     }
     return false;
 }
@@ -132,11 +124,11 @@ function get_web_port() {
 
     port.onMessage.addListener(function (msg) {
         window.console.log("Received", msg);
-        if (msg.status === null)
+        if (msg.result.status === null)
             return;
         var div = document.getElementsByClassName("m" + msg.id)[0];
-        hide_signature(div);
-        div.insertBefore(build_alert(msg), div.firstChild);
+        hide_signature(msg.result.filename, div);
+        div.insertBefore(build_alert(msg.result), div.firstChild);
     });
 
     return port;
@@ -149,19 +141,6 @@ function send_message_web_port(message) {
         web_port = get_web_port();
         web_port.postMessage(message);
     }
-}
-
-function get_orig_message(id, callback) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            callback(xmlHttp.responseText);
-        }
-    };
-    var auth = window.GLOBALS[9];
-    var url = "https://mail.google.com/mail/u/0/?ui=2&ik=" + auth + "&view=om&th=" + id;
-    xmlHttp.open("GET", url, false);
-    xmlHttp.send(null);
 }
 
 function look_for_messages() {
@@ -179,15 +158,10 @@ function look_for_messages() {
             }
         }
         if (id) {
-            get_orig_message(id, function (message) {
-                if (message.match(/^-+BEGIN PGP SIGNATURE-+/m)) {
-                    var info = {};
-                    info.command = "verify";
-                    info.id = id;
-                    info.message = message;
-                    send_message_web_port(info);
-                }
-            });
+            var info = {};
+            info.command = "verify";
+            info.id = id;
+            send_message_web_port(info);
         }
     }
 }

@@ -2,39 +2,12 @@
 
 import struct
 import sys
-import gpg_wrapper
 import json
-import base64
-from commands import getstatusoutput
+import sys
 
+from commandhandler import CommandHandler
 
-def _call_nodejs(command, param):
-    return getstatusoutput('''nodejs -e "console.log(%s('%s'));"''' %
-                           (command, param))[1]
-
-
-def escape(msg):
-    return _call_nodejs('escape', msg)
-
-
-def unescape(msg):
-    return _call_nodejs('unescape', msg)
-
-
-def decodeURIComponent(msg):
-    return _call_nodejs('decodeURIComponent', msg)
-
-
-def encodeURIComponent(msg):
-    return _call_nodejs('encodeURIComponent', msg)
-
-
-def utf8_to_b64(msg):
-    return base64.b64encode(encodeURIComponent(escape(msg)))
-
-
-def b64_to_utf8(msg):
-    return unescape(decodeURIComponent(base64.b64decode(msg)))
+sys.stderr = open('/tmp/goopg.err', 'a')
 
 
 def send_message(message):
@@ -46,13 +19,10 @@ def send_message(message):
     sys.stdout.flush()
 
 
-def send_debug(message):
-    send_message('{"debug": "%s"}' % message)
-
-
 def read_thread_func():
     """Thread that reads messages from the webapp."""
     #message_number = 0
+    handler = CommandHandler()
     while 1:
         # Read the message length (first 4 bytes).
         text_length_bytes = sys.stdin.read(4)
@@ -62,13 +32,13 @@ def read_thread_func():
 
         # Read the text (JSON object) of the message.
         raw_text = sys.stdin.read(text_length).decode('utf-8')
-        open('/tmp/raw', 'w').write(json.loads(raw_text))
-        text = b64_to_utf8(json.loads(raw_text))
-        open('/tmp/clean', 'w').write(text)
+        command = json.loads(raw_text)
+        result = handler.parse(command)
+        if result:
+            command['result'] = result
+            command = json.dumps(command)
+            send_message(command)
 
-        verified = gpg_wrapper.verify(text)
-        verified['id'] = text.split('\n')[0].replace('X-GM-MSGID:', '').strip()
-        send_message(json.dumps(verified))
 
 if __name__ == '__main__':
     read_thread_func()
