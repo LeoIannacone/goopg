@@ -28,7 +28,7 @@ def verify(data):
 def messageFromSignature(signature):
     message = email.Message()
     message['Content-Type'] = 'application/pgp-signature; name="signature.asc"'
-    message['Content-Description'] = 'OpenPGP digital signature'
+    message['Content-Description'] = 'Goopg digital signature'
     message.set_payload(signature)
     return message
 

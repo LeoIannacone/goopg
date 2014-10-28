@@ -122,7 +122,7 @@ var web_port = null;
 
 function get_web_port() {
 
-    var goopgExtensionId = "ddlebbablilfigfkkjedbpapjichmjgd";
+    var goopgExtensionId = "ppopiamobkilibbniemlecehjmbfbjjp";
     window.console.log("Connecting to web port...");
     var port = window.chrome.runtime.connect(goopgExtensionId);
 
