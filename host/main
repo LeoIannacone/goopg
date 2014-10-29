@@ -41,7 +41,7 @@ def main():
     while 1:
         command = read_message()
         result = handler.parse(command)
-        if result:
+        if result is not None:
             command['result'] = result
             send_message(command)
 

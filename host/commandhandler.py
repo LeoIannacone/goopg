@@ -23,8 +23,10 @@ class CommandHandler(object):
     def sign(self, message):
         draft = self.gmail.get(message["id"])
         new_message = self.gpgmail.sign(draft)
-        self.gmail.send(message["id"], new_message)
-        return new_message
+        if new_message:
+            #self.gmail.send(message["id"], new_message)
+            return True
+        return False
 
 
 

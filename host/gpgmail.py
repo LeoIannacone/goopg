@@ -99,7 +99,7 @@ class GPGMail(object):
             "Bcc",
             "Cc",
             "Reply-To",
-            #"Sender",
+            "Sender",
             "References",
             "In-Reply-To"
         ]
@@ -122,7 +122,9 @@ class GPGMail(object):
             basemsg = MIMEUTF8QPText(message.get_payload())
 
         # sign the message
-        basetxt = basemsg.as_string().replace('\n', '\r\n')
+        basetxt = basemsg.as_string()\
+                         .replace('\r\n', '\n')\
+                         .replace('\n', '\r\n')
         signature = str(self.gpg.sign(basetxt, detach=True))
 
         # attach the orig message
