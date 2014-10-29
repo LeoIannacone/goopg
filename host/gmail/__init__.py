@@ -53,9 +53,9 @@ class GMail():
         message = base64.urlsafe_b64decode(str(message['raw']))
         return email.message_from_string(message)
 
-    def send(self, id, message, delete_draft=False):
+    def send(self, id, message, delete_draft=True):
         raw = base64.urlsafe_b64encode(message.as_string())
-        body = {'message': {'raw': raw}}
+        body = {'raw': raw}
         self.messages.send(userId='me', body=body).execute()
         if delete_draft:
             response = self.drafts.list(userId='me').execute()
@@ -67,9 +67,3 @@ class GMail():
                     draft_id = draft['id']
                     self.drafts.delete(userId='me', id=draft_id).execute()
                     break
-
-
-if __name__ == '__main__':
-    #print GMail().get('14955b365fa08f14')
-    print GMail().send('1495bb566c157b3b', 'm')
-
