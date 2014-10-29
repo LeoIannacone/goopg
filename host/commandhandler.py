@@ -23,8 +23,7 @@ class CommandHandler(object):
     def sign(self, message):
         draft = self.gmail.get(message["id"])
         new_message = self.gpgmail.sign(draft)
-        #return self.verify(message)
-        #self.gmail.send(message["id"], new_message, delete_draft=True)
+        self.gmail.send(message["id"], new_message)
         return new_message
 
 
@@ -39,7 +38,9 @@ if __name__ == '__main__':
     # print json.dumps(result)
 
     v = {"command": "sign"}
-    v['id'] = "1495c4690857a02b"
-    v['id'] = '1495c27cf9211a92' # with attached
+    # v['id'] = "1495c4690857a02b"
+    v['id'] = '1495ce88d1d5aa13' # with attached
+    #v['id'] = '1495cc6efac0fb9f' # in reply-to
     result = h.parse(v)
+    #print result.as_string()
     #print json.dumps(result)

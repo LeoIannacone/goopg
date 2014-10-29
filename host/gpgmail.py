@@ -1,19 +1,11 @@
-# -*- mode:python; coding:utf-8; -*- Time-stamp: <gpgmail.py - root>
-# copyright (c) konstantin.co.uk. all rights reserved.
-# Origin: https://code.google.com/p/python-gnupg/issues/
-#         attachmentText?id=4&aid=7243301884964405207&name=
-#         gpgmail.py&token=2e585ecf0d148cb330041b1b00d769ff
-
-#__all__ = ['_filter_parts', '_flatten', '_signed_parts']
-
 import re
+import email
 
 from cStringIO import StringIO
 from email.generator import Generator
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import email
+from email.mime.nonmultipart import MIMENonMultipart
 from gnupg import GPG
 
 
@@ -81,15 +73,8 @@ class GPGMail(object):
                 payload = part.get_payload(decode=True)
                 yield self.gpg.verify(payload), None
 
-    def _messageFromSignature(self, signature):
-        message = Message()
-        message['Content-Type'] = 'application/pgp-signature; ' + \
-                                  'name="signature.asc"'
-        message['Content-Description'] = 'GooPG digital signature'
-        message.set_payload(signature)
-        return message
-
     def verify(self, message):
+        """Verify signature of a email message and returns the GPG info"""
         result = {}
         for verified, filename in self._signed_parts(message):
             if verified is not None:
@@ -103,35 +88,64 @@ class GPGMail(object):
         return result
 
     def sign(self, message):
+        """Sign a email message and return the new message signed"""
         new_message = MIMEMultipart(_subtype="signed", micalg="pgp-sha512",
                                     protocol="application/pgp-signature")
-        for i in ["Date", "To", "From", "Subject", "Bcc", "Cc"]:
-            if i in message:
-                new_message[i] = message[i]
+        header_to_copy = [
+            "Date",
+            "Subject",
+            "From",
+            "To",
+            "Bcc",
+            "Cc",
+            "Reply-To",
+            #"Sender",
+            "References",
+            "In-Reply-To"
+        ]
+        for h in header_to_copy:
+            if h in message:
+                new_message[h] = message[h]
 
-        for part in message.walk():
-            if part.get_content_maintype() == 'text':
-                body = part.get_payload()
-                basemsg = MIMEUTF8QPText(body)
-                basetxt = basemsg.as_string().replace('\n', '\r\n')
-                signature = str(self.gpg.sign(basetxt, detach=True))
-                new_message.attach(basemsg)
-                new_message.attach(self._messageFromSignature(signature))
+        # if has attachments, attach everything..
+        if message.get_content_type() == 'multipart/mixed':
+            basemsg = MIMEMultipart(_subtype='mixed')
+            for part in message.walk():
+                # the body message
+                if part.get_content_maintype() == 'text':
+                    basemsg.attach(MIMEUTF8QPText(part.get_payload()))
+                # the attachments
+                elif part.get('Content-Disposition'):
+                    basemsg.attach(part)
+        # else get only the body message
+        else:
+            basemsg = MIMEUTF8QPText(message.get_payload())
 
-                # # start sign inline
-                # new_message = Message()
-                # signature = str(self.gpg.sign(body))
-                # new_message.set_payload(signature)
-                # # end sign inline
-            elif part.get_content_maintype() == 'application':
-                new_message.attach(part)
+        # sign the message
+        basetxt = basemsg.as_string().replace('\n', '\r\n')
+        signature = str(self.gpg.sign(basetxt, detach=True))
+
+        # attach the orig message
+        new_message.attach(basemsg)
+
+        # attach the signature
+        sigmsg = Message()
+        sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
+                                 'name="signature.asc"'
+        sigmsg['Content-Description'] = 'GooPG digital signature'
+        sigmsg.set_payload(signature)
+        new_message.attach(sigmsg)
+
         return new_message
 
 
-class MIMEUTF8QPText(email.mime.nonmultipart.MIMENonMultipart):
+# This class is used to have a message with:
+#  Content-Transfer-Encoding: quoted-printable
+# It's required in RFC 3156
+class MIMEUTF8QPText(MIMENonMultipart):
     def __init__(self, payload):
-        email.mime.nonmultipart.MIMENonMultipart.__init__(self, 'text', 'plain',
-                                                          charset='utf-8')
+        MIMENonMultipart.__init__(self, 'text', 'plain',
+                                  charset='utf-8')
         utf8qp = email.charset.Charset('utf-8')
         utf8qp.body_encoding = email.charset.QP
         self.set_payload(payload, charset=utf8qp)
