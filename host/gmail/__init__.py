@@ -44,6 +44,7 @@ class GMail():
         # Build the Gmail service from discovery
         self.gmail_service = build('gmail', 'v1', http=http)
         self.messages = self.gmail_service.users().messages()
+        self.drafts = self.gmail_service.users().drafts()
 
     def get(self, id):
         # this return a message.raw in url safe base64
@@ -52,6 +53,23 @@ class GMail():
         message = base64.urlsafe_b64decode(str(message['raw']))
         return email.message_from_string(message)
 
+    def send(self, id, message, delete_draft=False):
+        raw = base64.urlsafe_b64encode(message.as_string())
+        body = {'message': {'raw': raw}}
+        self.messages.send(userId='me', body=body).execute()
+        if delete_draft:
+            response = self.drafts.list(userId='me').execute()
+            drafts = response['drafts']
+            draft_id = None
+            for draft in drafts:
+                if draft['message']['id'] == id:
+                    #print "deleting draft %s" % draft_id
+                    draft_id = draft['id']
+                    self.drafts.delete(userId='me', id=draft_id).execute()
+                    break
+
 
 if __name__ == '__main__':
-    print GMail().get('14955b365fa08f14')
+    #print GMail().get('14955b365fa08f14')
+    print GMail().send('1495bb566c157b3b', 'm')
+

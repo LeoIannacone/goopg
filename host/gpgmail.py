@@ -12,13 +12,15 @@ from cStringIO import StringIO
 from email.generator import Generator
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import email
 from gnupg import GPG
 
 
 class GPGMail(object):
 
     def __init__(self):
-        self.gpg = GPG(gpgbinary='gpg2', use_agent=True)
+        self.gpg = GPG(use_agent=True)
 
     def _armor(self, container, message, signature):
         if container.get_param('protocol') == 'application/pgp-signature':
@@ -101,18 +103,35 @@ class GPGMail(object):
         return result
 
     def sign(self, message):
-        payload = message.get_payload()
-        basetext = payload.as_string().replace('\n', '\r\n')
-        signature = str(self.gpg.sign(basetext, detach=True))
-        if signature:
-            signmsg = self._messageFromSignature(signature)
-            msg = MIMEMultipart(_subtype="signed", micalg="pgp-sha1",
-                                protocol="application/pgp-signature")
-            msg.attach(message)
-            msg.attach(signmsg)
-            msg['Subject'] = "Test message"
-            msg['From'] = "sender@example.com"
-            msg['To'] = "recipient@example.com"
-            print(msg.as_string(unixfrom=True))  # or send
-        else:
-            print('Warning: failed to sign the message!')
+        new_message = MIMEMultipart(_subtype="signed", micalg="pgp-sha512",
+                                    protocol="application/pgp-signature")
+        for i in ["Date", "To", "From", "Subject", "Bcc", "Cc"]:
+            if i in message:
+                new_message[i] = message[i]
+
+        for part in message.walk():
+            if part.get_content_maintype() == 'text':
+                body = part.get_payload()
+                basemsg = MIMEUTF8QPText(body)
+                basetxt = basemsg.as_string().replace('\n', '\r\n')
+                signature = str(self.gpg.sign(basetxt, detach=True))
+                new_message.attach(basemsg)
+                new_message.attach(self._messageFromSignature(signature))
+
+                # # start sign inline
+                # new_message = Message()
+                # signature = str(self.gpg.sign(body))
+                # new_message.set_payload(signature)
+                # # end sign inline
+            elif part.get_content_maintype() == 'application':
+                new_message.attach(part)
+        return new_message
+
+
+class MIMEUTF8QPText(email.mime.nonmultipart.MIMENonMultipart):
+    def __init__(self, payload):
+        email.mime.nonmultipart.MIMENonMultipart.__init__(self, 'text', 'plain',
+                                                          charset='utf-8')
+        utf8qp = email.charset.Charset('utf-8')
+        utf8qp.body_encoding = email.charset.QP
+        self.set_payload(payload, charset=utf8qp)
