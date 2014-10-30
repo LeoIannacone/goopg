@@ -12,7 +12,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
 
-from smtplib import SMTP
+from smtplib import SMTP, SMTPServerDisconnected
 from multiprocessing import Process, Queue
 
 from xdg import BaseDirectory
@@ -65,11 +65,11 @@ class GMail():
 
         # Use smtp as workaround to send message, GMail API
         # bugged with Content-Type: multipart/signed
-        self.smtp = SMTP('smtp.gmail.com', 587)
         self._smtp_login()
 
     def _smtp_login(self):
         # intialize SMTP procedure
+        self.smtp = SMTP('smtp.gmail.com', 587)
 
         #self.smtp.set_debuglevel(True)
         self.smtp.starttls()
@@ -110,7 +110,12 @@ class GMail():
         #             break
         sender = message['From']
         receiver = message['To']
-        self.smtp.sendmail(sender, receiver, message.as_string())
+        try:
+            self.smtp.sendmail(sender, receiver, message.as_string())
+        except SMTPServerDisconnected:
+            self._smtp_login()
+            self.smtp.sendmail(sender, receiver, message.as_string())
+
 
 
 def _login(queue, flow, storage, http):
