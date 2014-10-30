@@ -1,4 +1,7 @@
 "use strict";
+
+var USERNAME = GLOBALS[10];
+
 var GOOPG_CLASS_PREFIX = "goopg-";
 var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
 var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
@@ -223,6 +226,16 @@ function look_for_compositors() {
         parent.appendChild(new_button);
     }
 }
+
+function init() {
+    var info = {};
+    info.command = 'init';
+    info.options = {};
+    info.options.username = USERNAME;
+    send_message_web_port(info);
+}
+
+init();
 
 document.body.addEventListener("DOMSubtreeModified", look_for_signedmessages, false);
 document.body.addEventListener("DOMSubtreeModified", look_for_compositors, false);

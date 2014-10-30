@@ -12,10 +12,16 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
 
+from multiprocessing import Process, Queue
+
+from xdg import BaseDirectory
+
+credentials = None
+
 
 class GMail():
 
-    def __init__(self):
+    def __init__(self, username):
         # Path to the client_secret.json file
         # downloaded from the Developer Console
         current_path = os.path.dirname(os.path.abspath(__file__))
@@ -26,7 +32,9 @@ class GMail():
         OAUTH_SCOPE = 'https://www.googleapis.com/auth/gmail.modify'
 
         # Location of the credentials storage file
-        STORAGE = Storage(os.path.join(current_path, 'gmail.storage'))
+        cache_dir = os.path.join('goopg', 'storage')
+        cache_dir = BaseDirectory.save_cache_path(cache_dir)
+        STORAGE = Storage(os.path.join(cache_dir, username))
 
         # Start the OAuth flow to retrieve credentials
         flow = flow_from_clientsecrets(CLIENT_SECRET_FILE, scope=OAUTH_SCOPE)
@@ -35,8 +43,15 @@ class GMail():
         # Try to retrieve credentials from storage
         # or run the flow to generate them
         credentials = STORAGE.get()
+
         if credentials is None or credentials.invalid:
-            credentials = run(flow, STORAGE, http=http)
+            # call a subprocess as workaround for stdin/stdout
+            # blocked by the main process
+            queue = Queue()
+            p = Process(target=_login, args=(queue, flow, STORAGE, http))
+            p.start()
+            p.join()
+            credentials = queue.get()
 
         # Authorize the httplib2.Http object with our credentials
         http = credentials.authorize(http)
@@ -67,3 +82,7 @@ class GMail():
                     draft_id = draft['id']
                     self.drafts.delete(userId='me', id=draft_id).execute()
                     break
+
+
+def _login(queue, flow, storage, http):
+    queue.put(run(flow, storage, http=http))
