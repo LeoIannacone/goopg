@@ -10,8 +10,8 @@ var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
 var GOOGLE_CLASS_MESSAGE = "ii";
 //var GOOGLE_CLASS_CONTROLS = "IZ";
 var GOOGLE_CLASS_SENDBUTTON = "aoO";
-var GOOGLE_CLASS_DISCARDBUTTON = 'og';
-var GOOGLE_CLASS_ALERTMSG = 'vh';
+var GOOGLE_CLASS_DISCARD_BUTTON = 'og';
+var GOOGLE_CLASS_DISCARD_ALERTMSG = 'vh';
 
 String.prototype.capitalize = function () {
     return this.replace(/(?:^|\s)\S/g, function (a) {
@@ -42,9 +42,9 @@ var Utils = {
     },
 
     hide_signature: function (filename, div) {
-        var body = div.firstChild.innerHTML;
         if (filename === null) {
             // try to hide inline signature
+            var body = div.firstChild.innerHTML;
             var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
             info = info[info.length - 1];
             info = info.split(/^-+BEGIN PGP SIGNATURE-+<br>\n/m)[0];
@@ -128,7 +128,41 @@ var Utils = {
         //new_button.className += ' T-I-JW';
         new_button.innerHTML = 'Sign and Send';
         return new_button;
+    },
+
+    change_discard_alert: function () {
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_DISCARD_ALERTMSG)[0];
+
+        function changer(e) {
+            alert.innerHTML = "Your message has been signed and sent.";
+            alert.removeEventListener(e.type, changer);
+        }
+        alert.addEventListener("DOMSubtreeModified", changer);
+    },
+
+    hide_compositor: function (button_id) {
+        var button = document.getElementById(button_id);
+        if (button === null)
+            return;
+
+        var e = button;
+        while (e.parentElement) {
+            e = e.parentElement;
+            var discard = e.getElementsByClassName(GOOGLE_CLASS_DISCARD_BUTTON);
+            if (discard.length === 0)
+                continue;
+            else if (discard.length > 1)
+                return;
+            else {
+                discard = discard[0];
+                Utils.change_discard_alert();
+                discard.click();
+                break;
+            }
+        }
+
     }
+
 };
 
 
@@ -147,14 +181,19 @@ function get_web_port() {
 
     port.onMessage.addListener(function (msg) {
         window.console.log("Received", msg);
-        if (msg.command == "verify") {
+        // handl the message received
+        if (msg.command == 'request_init') {
+            send_message_web_port(get_init_command());
+        } else if (msg.command == "verify") {
             if (msg.result.status === null)
                 return;
             var div = document.getElementsByClassName("m" + msg.id)[0];
             Utils.hide_signature(msg.result.filename, div);
             div.insertBefore(Utils.build_alert(msg.result), div.firstChild);
-        } else if (msg.command == 'request_init') {
-            send_message_web_port(get_init_command());
+        } else if (msg.command == "sign") {
+            if (msg.result === false)
+                return;
+            Utils.hide_compositor(msg.button_id);
         }
     });
 
