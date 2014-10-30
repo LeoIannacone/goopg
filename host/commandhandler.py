@@ -30,17 +30,17 @@ class CommandHandler(object):
 
     def verify(self, message):
         if not self.initialized:
-            return
+            return False
         mail = self.gmail.get(message["id"])
         return self.gpgmail.verify(mail)
 
     def sign(self, message):
         if not self.initialized:
-            return
+            return False
         draft = self.gmail.get(message["id"])
         new_message = self.gpgmail.sign(draft)
         if new_message:
-            #self.gmail.send(message["id"], new_message)
+            self.gmail.send(message["id"], new_message)
             return True
         return False
 
