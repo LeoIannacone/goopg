@@ -211,8 +211,10 @@ function get_web_port() {
             if (msg.result.status === null)
                 return;
             var div = document.getElementsByClassName("m" + msg.id)[0];
+            if (div === null)
+                return;
             Utils.hide_signature(msg.result.filename, div);
-            div.insertBefore(Utils.build_message_sign_abanner(msg.result), div.firstChild);
+            div.insertBefore(Utils.build_message_sign_banner(msg.result), div.firstChild);
         } else if (msg.command == "sign") {
             if (msg.result === false)
                 Utils.alert("Your message was not sent. Please retry.");
