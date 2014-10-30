@@ -38,12 +38,24 @@ def main():
     """Thread that reads messages from the webapp."""
     #message_number = 0
     handler = CommandHandler()
+    send_message({"command": "request_init"})
+    queue_messages = []
     while 1:
         command = read_message()
-        result = handler.parse(command)
-        if result is not None:
-            command['result'] = result
-            send_message(command)
+        if not handler.initialized and command['command'] != 'init':
+            queue_messages.append(command)
+        else:
+            def parse_and_send_result(c):
+                result = handler.parse(c)
+                if result is not None:
+                    c['result'] = result
+                    send_message(c)
+
+            parse_and_send_result(command)
+            if len(queue_messages) > 0:
+                for c in queue_messages:
+                    parse_and_send_result(c)
+                queue_messages = []
 
 
 if __name__ == '__main__':

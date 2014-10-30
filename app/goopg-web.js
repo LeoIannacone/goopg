@@ -153,10 +153,20 @@ function get_web_port() {
             var div = document.getElementsByClassName("m" + msg.id)[0];
             Utils.hide_signature(msg.result.filename, div);
             div.insertBefore(Utils.build_alert(msg.result), div.firstChild);
+        } else if (msg.command == 'request_init') {
+            send_message_web_port(get_init_command());
         }
     });
 
     return port;
+}
+
+function get_init_command() {
+    var init_command = {};
+    init_command.command = 'init';
+    init_command.options = {};
+    init_command.options.username = USERNAME;
+    return init_command;
 }
 
 function send_message_web_port(message) {
@@ -226,16 +236,6 @@ function look_for_compositors() {
         parent.appendChild(new_button);
     }
 }
-
-function init() {
-    var info = {};
-    info.command = 'init';
-    info.options = {};
-    info.options.username = USERNAME;
-    send_message_web_port(info);
-}
-
-init();
 
 document.body.addEventListener("DOMSubtreeModified", look_for_signedmessages, false);
 document.body.addEventListener("DOMSubtreeModified", look_for_compositors, false);

@@ -43,21 +43,3 @@ class CommandHandler(object):
             self.gmail.send(message["id"], new_message)
             return True
         return False
-
-
-if __name__ == '__main__':
-    import json
-    h = CommandHandler()
-    # v = {"command": "verify"}
-    # v['id'] = "145f1ee82379fe8d"  # in line
-    # v['id'] = "145f209c26d573f4"  # attached
-    # result = h.parse(v)
-    # print json.dumps(result)
-
-    v = {"command": "sign"}
-    # v['id'] = "1495c4690857a02b"
-    v['id'] = '1495ce88d1d5aa13' # with attached
-    #v['id'] = '1495cc6efac0fb9f' # in reply-to
-    result = h.parse(v)
-    #print result.as_string()
-    #print json.dumps(result)

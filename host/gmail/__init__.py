@@ -69,10 +69,8 @@ class GMail():
         self._smtp_login()
 
     def _smtp_login(self):
-        # if self.credentials.access_token_expired or \
-        #    self.credentials.access_token is None:
-        #     self.credentials = self.credentials.refresh(self.http)
         # intialize SMTP procedure
+
         #self.smtp.set_debuglevel(True)
         self.smtp.starttls()
         self.smtp.ehlo()
