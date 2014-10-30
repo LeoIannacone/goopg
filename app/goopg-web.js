@@ -216,9 +216,15 @@ function get_web_port() {
             Utils.hide_signature(msg.result.filename, div);
             div.insertBefore(Utils.build_message_sign_banner(msg.result), div.firstChild);
         } else if (msg.command == "sign") {
-            if (msg.result === false)
+            if (msg.result === false) {
                 Utils.alert("Your message was not sent. Please retry.");
-            else if (msg.result === true)
+                var button = document.getElementById(msg.button_id);
+                if (button) {
+                    button.addEventListener('click', on_click_sendsignbutton);
+                    button.style.color = "";
+                    button.innerHTML = "Sign and Send";
+                }
+            } else if (msg.result === true)
                 Utils.hide_compositor(msg.button_id);
         }
     });
@@ -280,7 +286,10 @@ function on_click_sendsignbutton() {
                 info.id = input.getAttribute('value');
                 info.button_id = this.id;
                 send_message_web_port(info);
-                //console.log(info)
+                this.style.width = window.getComputedStyle(this).width;
+                this.style.color = "#999";
+                this.innerHTML = "Sending";
+                this.removeEventListener("click", on_click_sendsignbutton);
                 return;
             }
         }
