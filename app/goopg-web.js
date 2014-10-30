@@ -6,6 +6,7 @@ var GOOPG_CLASS_PREFIX = "goopg-";
 var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
 var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
+var GOOPG_CLASS_ALERT = GOOPG_CLASS_PREFIX + "alert";
 
 var GOOGLE_CLASS_MESSAGE = "ii";
 //var GOOGLE_CLASS_CONTROLS = "IZ";
@@ -73,7 +74,7 @@ var Utils = {
         return false;
     },
 
-    build_alert: function (msg) {
+    build_message_sign_banner: function (msg) {
         var className;
         var text;
         var icon;
@@ -134,8 +135,8 @@ var Utils = {
         var alert = document.getElementsByClassName(GOOGLE_CLASS_DISCARD_ALERTMSG)[0];
 
         function changer(e) {
-            alert.innerHTML = "Your message has been signed and sent.";
             alert.removeEventListener(e.type, changer);
+            alert.innerHTML = "Your message has been signed and sent. ";
         }
         alert.addEventListener("DOMSubtreeModified", changer);
     },
@@ -160,6 +161,28 @@ var Utils = {
                 break;
             }
         }
+    },
+
+    alert: function (msg) {
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_DISCARD_ALERTMSG)[0];
+        var random_id = GOOPG_CLASS_ALERT + Math.random();
+        alert.innerHTML = '<span id="' + random_id + '">' + msg + '</span>';
+        // show the alert ; gmail hides this by setting top = -10000px over this container
+        var alert_container = alert.parentElement.parentElement;
+        alert_container.style.top = '0px';
+        // remove the alert after 15 s if still present
+        setTimeout(function () {
+            var this_alert = document.getElementById(random_id);
+            if (this_alert) {
+                var parent = this_alert.parentElement;
+                parent.removeChild(this_alert);
+                // revert
+                if (parent.children.length === 0) {
+                    alert_container.style.top = "-10000px";
+                }
+
+            }
+        }, 15000);
 
     }
 
@@ -189,11 +212,12 @@ function get_web_port() {
                 return;
             var div = document.getElementsByClassName("m" + msg.id)[0];
             Utils.hide_signature(msg.result.filename, div);
-            div.insertBefore(Utils.build_alert(msg.result), div.firstChild);
+            div.insertBefore(Utils.build_message_sign_abanner(msg.result), div.firstChild);
         } else if (msg.command == "sign") {
             if (msg.result === false)
-                return;
-            Utils.hide_compositor(msg.button_id);
+                Utils.alert("Your message was not sent. Please retry.");
+            else if (msg.result === true)
+                Utils.hide_compositor(msg.button_id);
         }
     });
 
