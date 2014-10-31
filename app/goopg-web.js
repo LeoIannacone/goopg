@@ -202,8 +202,8 @@ function get_web_port() {
     });
 
     port.onMessage.addListener(function (msg) {
-        window.console.log("Received", msg);
-        // handl the message received
+        //window.console.log("Received", msg);
+        // handle the message received
         if (msg.command == 'request_init') {
             send_message_web_port(get_init_command());
         } else if (msg.command == "verify") {
