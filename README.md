@@ -13,7 +13,8 @@ cd -
 
 # Install in Chrome #
 * Open [chrome://extensions](chrome://extensions) in the browser
-* Install `unpackaged extension` (directory is `app`)
+* Click on "Developer mode"
+* Then click on "Load unpackage extension" and select the dir `app`
 
 # Update the app ID #
 Once extension is installed, get the `NEW_ID` extension in chrome://extension and run:
