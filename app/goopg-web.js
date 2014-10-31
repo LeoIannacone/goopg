@@ -189,8 +189,6 @@ var Utils = {
 
 };
 
-
-
 var web_port = null;
 
 function get_web_port() {
@@ -276,12 +274,32 @@ function look_for_signedmessages() {
 // check if message is saved, starting from the sending button
 function message_is_saved(button) {
     var tr = button.parentElement.parentElement.parentElement;
-    return tr.getElementsByClassName(GOOGLE_CLASS_MESSAGE_SAVED) == 1;
+    return tr.getElementsByClassName(GOOGLE_CLASS_MESSAGE_SAVED).length == 1;
+}
+
+function get_message_id(button) {
+    var e = button;
+    // get the message id, in html: <input name="draft" value="MSG_ID" />
+    while (e.parentElement) {
+        e = e.parentElement;
+        var inputs = e.getElementsByTagName('input');
+        for (var j = 0; j < inputs.length; j++) {
+            var input = inputs[j];
+            if (input.getAttribute('name') == "draft") {
+                return input.getAttribute('value');
+            }
+        }
+    }
 }
 
 function on_click_sendsignbutton(event) {
     // the sending button
     var button = event.target;
+    var draft_id = get_message_id(button);
+    if (draft_id == "undefined") {
+        Utils.alert("Your message does not still exists in Drafts. Please save it and retry.");
+        return;
+    }
     // prevent multi click
     button.removeEventListener("click", on_click_sendsignbutton);
     // stylish the button pressed
@@ -295,23 +313,11 @@ function on_click_sendsignbutton(event) {
         }, 500);
         return;
     }
-    var e = button;
-    // get the message id, in html: <input name="draft" value="MSG_ID" />
-    while (e.parentElement) {
-        e = e.parentElement;
-        var inputs = e.getElementsByTagName('input');
-        for (var j = 0; j < inputs.length; j++) {
-            var input = inputs[j];
-            if (input.getAttribute('name') == "draft") {
-                var info = {};
-                info.command = "sign";
-                info.id = input.getAttribute('value');
-                info.button_id = button.id;
-                send_message_web_port(info);
-                return;
-            }
-        }
-    }
+    var info = {};
+    info.command = "sign";
+    info.id = draft_id;
+    info.button_id = button.id;
+    send_message_web_port(info);
 }
 
 function look_for_compositors() {
