@@ -292,12 +292,13 @@ function get_message_id(button) {
     }
 }
 
-function on_click_sendsignbutton(event) {
+function on_click_sendsignbutton(event, iterations) {
     // the sending button
     var button = event.target;
     var draft_id = get_message_id(button);
+
     if (draft_id == "undefined") {
-        Utils.alert("Your message does not still exists in Drafts. Please save it and retry.");
+        Utils.alert("Please save the Draft before sending.");
         return;
     }
     // prevent multi click
@@ -306,11 +307,17 @@ function on_click_sendsignbutton(event) {
     button.style.width = window.getComputedStyle(button).width;
     button.style.color = "#999";
     button.innerHTML = "Sending";
-    // if message is not saved, sleep a while and recall
-    if (!message_is_saved(button)) {
+    // If message is not saved, sleep a while (SLEEP_TIME in ms) and auto-recall
+    // Do this for MAX_ITERATIONS times (?)
+    var SLEEP_TIME = 500;
+    var MAX_ITERATIONS = 20;
+    if (iterations === undefined) {
+        iterations = 0;
+    }
+    if (!message_is_saved(button) && iterations < MAX_ITERATIONS) {
         setTimeout(function () {
-            on_click_sendsignbutton(event);
-        }, 500);
+            on_click_sendsignbutton(event, iterations + 1);
+        }, SLEEP_TIME);
         return;
     }
     var info = {};
