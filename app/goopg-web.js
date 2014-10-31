@@ -12,7 +12,8 @@ var GOOGLE_CLASS_MESSAGE = "ii";
 //var GOOGLE_CLASS_CONTROLS = "IZ";
 var GOOGLE_CLASS_SENDBUTTON = "aoO";
 var GOOGLE_CLASS_DISCARD_BUTTON = 'og';
-var GOOGLE_CLASS_DISCARD_ALERTMSG = 'vh';
+var GOOGLE_CLASS_ALERT = 'vh';
+var GOOGLE_CLASS_MESSAGE_SAVED = 'aOy';
 
 String.prototype.capitalize = function () {
     return this.replace(/(?:^|\s)\S/g, function (a) {
@@ -132,7 +133,7 @@ var Utils = {
     },
 
     change_discard_alert: function () {
-        var alert = document.getElementsByClassName(GOOGLE_CLASS_DISCARD_ALERTMSG)[0];
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
 
         function changer(e) {
             alert.removeEventListener(e.type, changer);
@@ -164,7 +165,7 @@ var Utils = {
     },
 
     alert: function (msg) {
-        var alert = document.getElementsByClassName(GOOGLE_CLASS_DISCARD_ALERTMSG)[0];
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
         var random_id = GOOPG_CLASS_ALERT + Math.random();
         alert.innerHTML = '<span id="' + random_id + '">' + msg + '</span>';
         // show the alert ; gmail hides this by setting top = -10000px over this container
@@ -272,8 +273,29 @@ function look_for_signedmessages() {
     }
 }
 
-function on_click_sendsignbutton() {
-    var e = this;
+// check if message is saved, starting from the sending button
+function message_is_saved(button) {
+    var tr = button.parentElement.parentElement.parentElement;
+    return tr.getElementsByClassName(GOOGLE_CLASS_MESSAGE_SAVED) == 1;
+}
+
+function on_click_sendsignbutton(event) {
+    // the sending button
+    var button = event.target;
+    // prevent multi click
+    button.removeEventListener("click", on_click_sendsignbutton);
+    // stylish the button pressed
+    button.style.width = window.getComputedStyle(button).width;
+    button.style.color = "#999";
+    button.innerHTML = "Sending";
+    // if message is not saved, sleep a while and recall
+    if (!message_is_saved(button)) {
+        setTimeout(function () {
+            on_click_sendsignbutton(event);
+        }, 500);
+        return;
+    }
+    var e = button;
     // get the message id, in html: <input name="draft" value="MSG_ID" />
     while (e.parentElement) {
         e = e.parentElement;
@@ -284,12 +306,8 @@ function on_click_sendsignbutton() {
                 var info = {};
                 info.command = "sign";
                 info.id = input.getAttribute('value');
-                info.button_id = this.id;
+                info.button_id = button.id;
                 send_message_web_port(info);
-                this.style.width = window.getComputedStyle(this).width;
-                this.style.color = "#999";
-                this.innerHTML = "Sending";
-                this.removeEventListener("click", on_click_sendsignbutton);
                 return;
             }
         }
