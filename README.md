@@ -1,19 +1,27 @@
+![logo.png](https://bitbucket.org/repo/on9K89/images/2089013194-logo.png)
+
+# GPG for GMail #
+
 # Intro #
 
-WARN: This is an alpha version.
+**WARN**: This is an alpha version.
 
-What you can do:
- * Recruit alpha-testers:
-   - requirements: must be developers (or something like that)
-   - how: send to l3on@ubuntu.com the bitbucket account request
+### *What you can do:* ###
 
+* Recruit alpha-testers:
 
-Wath you cannot do:
- * Share the code for now, it will be realased when ready
+ * requirements: must be developers (or something like that)
+ * how: send to l3on@ubuntu.com the bitbucket account request
 
 
-What you should do:
- * Spread the world that GMail is going to get GPG verifycation/sign (ecypt/decrypt)
+### Wath you cannot do: ###
+
+* Share the code for now, it will be realased when ready
+
+
+### What you should do: ###
+
+* Spread screenshots about GMail is going to get new extension
 
 
 # Deps #
@@ -61,10 +69,11 @@ cd -
 Open http://gmail.com
 
 
-# Knonw issues
+# Knonw issues #
 Force digest sign algo to SHA512 in gpg:
 ```bash
 echo "personal-digest-preferences SHA512
 cert-digest-algo SHA512
 default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
 " >> ~/.gnupg/gpg.conf
+```
