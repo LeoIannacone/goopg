@@ -5,6 +5,17 @@
 
 set -e
 
+BROWSER=$1
+
+if [ "$BROWSER" == "" ] ; then
+  BROWSER="chromium"
+fi
+
+if [ "$BROWSER" != "chromium" -o "$BROWSER" != "google-chrome" ] ; then
+  echo "usage: ${0##*/} [chromium|google-chrome]"
+  exit 1
+fi
+
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 if [ $(uname -s) == 'Darwin' ]; then
   if [ "$(whoami)" == "root" ]; then
@@ -17,7 +28,7 @@ else
   if [ "$(whoami)" == "root" ]; then
     TARGET_DIR="/etc/opt/chrome/native-messaging-hosts"
   else
-    TARGET_DIR="$HOME/.config/chromium/NativeMessagingHosts"
+    TARGET_DIR="$HOME/.config/$BROWSER/NativeMessagingHosts"
   fi
 fi
 
