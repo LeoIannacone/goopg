@@ -1,7 +1,7 @@
 # Deps #
 
 ```bash
-sudo apt-get install node-less python-googleapi python-xdg python-gnupg
+sudo apt-get install node-less python-googleapi python-gflags python-xdg python-gnupg
 ```
 
 # Build the css #
