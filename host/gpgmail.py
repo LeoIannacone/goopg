@@ -113,13 +113,13 @@ class GPGMail(object):
             for part in message.walk():
                 # the body message
                 if part.get_content_maintype() == 'text':
-                    basemsg.attach(MIMEUTF8QPText(part.get_payload()))
+                    basemsg.attach(MIMEUTF8QPText(part))
                 # the attachments
                 elif part.get('Content-Disposition'):
                     basemsg.attach(part)
         # else get only the body message
         else:
-            basemsg = MIMEUTF8QPText(message.get_payload())
+            basemsg = MIMEUTF8QPText(message)
 
         # sign the message
         basetxt = basemsg.as_string()\
@@ -145,9 +145,10 @@ class GPGMail(object):
 #  Content-Transfer-Encoding: quoted-printable
 # It's required in RFC 3156
 class MIMEUTF8QPText(MIMENonMultipart):
-    def __init__(self, payload):
+    def __init__(self, message):
         MIMENonMultipart.__init__(self, 'text', 'plain',
                                   charset='utf-8')
         utf8qp = email.charset.Charset('utf-8')
         utf8qp.body_encoding = email.charset.QP
+        payload = message.get_payload(decode=True)
         self.set_payload(payload, charset=utf8qp)
