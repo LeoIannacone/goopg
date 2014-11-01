@@ -1,11 +1,9 @@
-# See https://developers.google.com/gmail/api/quickstart/quickstart-python?hl=it
-
-#!/usr/bin/python
-
 import httplib2
 import base64
 import email
 import os
+import sys
+import logging
 
 from apiclient.discovery import build
 from oauth2client.client import flow_from_clientsecrets
@@ -16,6 +14,8 @@ from smtplib import SMTP, SMTPServerDisconnected
 from multiprocessing import Process, Queue
 
 from xdg import BaseDirectory
+
+from util import StreamToLogger
 
 
 # Check https://developers.google.com/gmail/api/auth/scopes
@@ -51,6 +51,9 @@ class GMail():
             # call a subprocess as workaround for stdin/stdout
             # blocked by the main process, this is the main function:
             def _subprocess_login():
+                logger = logging.getLogger('GMailLogin')
+                sys.stdout = StreamToLogger(logger, logging.INFO)
+                sys.stderr = StreamToLogger(logger, logging.ERROR)
                 queue.put(run(flow, storage, http=self.http))
 
             # A Queue to get the result from subprocess
@@ -128,6 +131,10 @@ class GMail():
         #             break
         sender = message['From']
         receiver = message['To']
+        if sender is None:
+            raise TypeError("sender is None")
+        if receiver is None:
+            raise TypeError("receiver is None")
         try:
             self.smtp.sendmail(sender, receiver, message.as_string())
         except SMTPServerDisconnected:

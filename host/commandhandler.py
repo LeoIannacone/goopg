@@ -1,6 +1,8 @@
 from gpgmail import GPGMail
 from gmail import GMail
 
+import logging
+
 
 class CommandHandler(object):
 
@@ -8,6 +10,7 @@ class CommandHandler(object):
         self.gmail = None
         self.gpgmail = None
         self.initialized = False
+        self.logger = logging.getLogger('CommandHandler')
 
     def parse(self, message):
         result = None
@@ -44,8 +47,7 @@ class CommandHandler(object):
             if new_message:
                 self.gmail.send(message["id"], new_message)
                 result = True
-        except:
-            import traceback
-            traceback.print_exc()
+        except Exception, e:
+            self.logger.exception(e)
         finally:
             return result
