@@ -11,7 +11,7 @@ if [ "$BROWSER" == "" ] ; then
   BROWSER="chromium"
 fi
 
-if [ "$BROWSER" != "chromium" -o "$BROWSER" != "google-chrome" ] ; then
+if [ "$BROWSER" != "chromium" -a "$BROWSER" != "google-chrome" ] ; then
   echo "usage: ${0##*/} [chromium|google-chrome]"
   exit 1
 fi
