@@ -45,10 +45,19 @@ def main():
     # redirect stderr to logger
     sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
     handler = CommandHandler()
+
+    # send init request
     send_message({"command": "request_init"})
+
+    # a queue to store messages received before the 'init' command
     queue_messages = []
     while 1:
-        command = read_message()
+        try:
+            command = read_message()
+        except struct.error, e:
+            logging.error("Error while reading stdin: \"{}\"".format(e.message))
+            logging.error("Exit 1")
+            sys.exit(1)
         if not handler.initialized and command['command'] != 'init':
             queue_messages.append(command)
         else:
@@ -59,6 +68,7 @@ def main():
                     send_message(c)
 
             parse_and_send_result(command)
+
             if len(queue_messages) > 0:
                 for c in queue_messages:
                     parse_and_send_result(c)
