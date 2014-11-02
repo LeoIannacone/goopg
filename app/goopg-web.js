@@ -1,29 +1,32 @@
 "use strict";
 
+// get the username
 var USERNAME = GLOBALS[10];
 
+
+// my css classes
 var GOOPG_CLASS_PREFIX = "goopg-";
 var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
 var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
 var GOOPG_CLASS_ALERT = GOOPG_CLASS_PREFIX + "alert";
 
+
+// google css classes
 var GOOGLE_CLASS_MESSAGE = "ii";
-//var GOOGLE_CLASS_CONTROLS = "IZ";
 var GOOGLE_CLASS_SENDBUTTON = "aoO";
 var GOOGLE_CLASS_DISCARD_BUTTON = 'og';
 var GOOGLE_CLASS_ALERT = 'vh';
 var GOOGLE_CLASS_MESSAGE_SAVED = 'aOy';
 
-String.prototype.capitalize = function () {
-    return this.replace(/(?:^|\s)\S/g, function (a) {
-        return a.toUpperCase();
-    });
-};
+
+// port to communicate with background
+var web_port = null;
+
 
 var Utils = {
 
-    escapeHtml: function (string) {
+    escape_html: function (string) {
         return String(string).replace(/[&<>"'\/]/g, function (s) {
             return {
                 "&": "&amp;",
@@ -36,13 +39,120 @@ var Utils = {
         });
     },
 
-    toggleDisplay: function (div) {
+    toggle_display: function (div) {
         if (div.style.display == "none")
             div.style.display = "block";
         else
             div.style.display = "none";
     },
 
+    capitalize: function (str) {
+        return str.replace(/(?:^|\s)\S/g, function (a) {
+            return a.toUpperCase();
+        });
+    }
+};
+
+
+var Alert = {
+    // set an alert msg
+    set: function (msg) {
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
+        var random_id = GOOPG_CLASS_ALERT + Math.random();
+        alert.innerHTML = '<span id="' + random_id + '">' + msg + '</span>';
+        // show the alert ; gmail hides this by setting top = -10000px over this container
+        var alert_container = alert.parentElement.parentElement;
+        alert_container.style.top = '0px';
+        // remove the alert after 15 s if still present
+        setTimeout(function () {
+            var this_alert = document.getElementById(random_id);
+            if (this_alert) {
+                var parent = this_alert.parentElement;
+                parent.removeChild(this_alert);
+                // revert
+                if (parent.children.length === 0) {
+                    alert_container.style.top = "-10000px";
+                }
+
+            }
+        }, 15000);
+    },
+
+    // replace the next message with a new one
+    replace_incoming_msg: function (new_msg) {
+        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
+
+        function changer(e) {
+            alert.removeEventListener(e.type, changer);
+            alert.innerHTML = new_msg;
+        }
+        alert.addEventListener("DOMSubtreeModified", changer);
+    }
+};
+
+
+var Port = {
+    // return a new port
+    get: function () {
+        var goopgExtensionId = "ppopiamobkilibbniemlecehjmbfbjjp";
+        window.console.log("Connecting to web port...");
+
+        var port = window.chrome.runtime.connect(goopgExtensionId);
+
+        port.onDisconnect.addListener(function () {
+            window.console.log("Failed to connect: " + window.chrome.runtime.lastError.message);
+        });
+
+        port.onMessage.addListener(Port.handler);
+
+        return port;
+    },
+
+    // send a msg
+    send: function (msg) {
+        try {
+            web_port.postMessage(msg);
+        } catch (err) {
+            web_port = Port.get();
+            web_port.postMessage(msg);
+        }
+    },
+
+    // the handler
+    handler: function (msg) {
+        // handle the message received
+        if (msg.command == 'request_init') {
+            var init_command = {};
+            init_command.command = 'init';
+            init_command.options = {};
+            init_command.options.username = USERNAME;
+            Port.send(init_command);
+        } else if (msg.command == "verify") {
+            if (msg.result.status === null)
+                return;
+            var div = document.getElementsByClassName("m" + msg.id)[0];
+            if (div === null)
+                return;
+            SignedMessage.hide_signature(msg.result.filename, div);
+            div.insertBefore(SignedMessage.get_banner(msg.result), div.firstChild);
+        } else if (msg.command == "sign") {
+            if (msg.result === false) {
+                Alert.set("Your message was not sent. Please retry.");
+                var button = document.getElementById(msg.button_id);
+                if (button) {
+                    button.addEventListener('click', SignSendButton.on_click);
+                    button.style.color = "";
+                    button.innerHTML = "Sign and Send";
+                }
+            } else if (msg.result === true)
+                SignSendButton.hide_compositor(msg.button_id);
+        }
+    }
+};
+
+
+var SignedMessage = {
+    // hide signature
     hide_signature: function (filename, div) {
         if (filename === null) {
             // try to hide inline signature
@@ -74,8 +184,8 @@ var Utils = {
         }
         return false;
     },
-
-    build_message_sign_banner: function (msg) {
+    // build the banner
+    get_banner: function (msg) {
         var className;
         var text;
         var icon;
@@ -104,26 +214,31 @@ var Utils = {
         var alert_header = document.createElement("div");
         alert_header.className = "alert-header";
         alert_header.innerHTML =
-            "<span class=\"pull-right glyphicon glyphicon glyphicon-" + icon + "\"></span>" +
-            "<strong>" + msg.status.capitalize() + ":</strong> " + Utils.escapeHtml(text);
+            "<span class=\"pull-right glyphicon glyphicon-" + icon + "\"></span>" +
+            "<strong>" + Utils.capitalize(msg.status) + ":</strong> " + Utils.escape_html(text);
         alert.appendChild(alert_header);
         if (msg.stderr) {
             var stderr = msg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
             alert_header.addEventListener("click", function () {
-                Utils.toggleDisplay(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
+                Utils.toggle_display(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
             });
             var alert_stderr = document.createElement("div");
             alert_stderr.className = "raw " + GOOPG_CLASS_STDERR;
             alert_stderr.style.display = "none";
-            alert_stderr.innerHTML = Utils.escapeHtml(stderr);
+            alert_stderr.innerHTML = Utils.escape_html(stderr);
             alert.appendChild(alert_stderr);
         }
 
         result.appendChild(alert);
         return result;
     },
+};
 
-    build_sendbutton: function () {
+
+
+var SignSendButton = {
+    // build the button element
+    get: function () {
         var new_button = document.createElement('div');
         new_button.className = GOOPG_CLASS_SENDBUTTON;
         new_button.id += GOOPG_CLASS_PREFIX + Math.random();
@@ -132,14 +247,61 @@ var Utils = {
         return new_button;
     },
 
-    change_discard_alert: function () {
-        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
+    // check if message is saved, starting from the sending button
+    message_is_saved: function (button) {
+        var tr = button.parentElement.parentElement.parentElement;
+        return tr.getElementsByClassName(GOOGLE_CLASS_MESSAGE_SAVED).length == 1;
+    },
 
-        function changer(e) {
-            alert.removeEventListener(e.type, changer);
-            alert.innerHTML = "Your message has been signed and sent. ";
+    // get the message id wrapped around button
+    get_message_id: function (button) {
+        var e = button;
+        // get the message id, in html: <input name="draft" value="MSG_ID" />
+        while (e.parentElement) {
+            e = e.parentElement;
+            var inputs = e.getElementsByTagName('input');
+            for (var j = 0; j < inputs.length; j++) {
+                var input = inputs[j];
+                if (input.getAttribute('name') == "draft") {
+                    return input.getAttribute('value');
+                }
+            }
         }
-        alert.addEventListener("DOMSubtreeModified", changer);
+    },
+
+    on_click: function (event, interactions) {
+        // the sending button
+        var button = event.target;
+        var draft_id = SignSendButton.get_message_id(button);
+
+        if (draft_id == "undefined") {
+            Alert.set("Please save the Draft before sending.");
+            return;
+        }
+        // prevent multi click
+        button.removeEventListener("click", SignSendButton.on_click);
+        // stylish the button pressed
+        button.style.width = window.getComputedStyle(button).width;
+        button.style.color = "#999";
+        button.innerHTML = "Sending";
+        // If message is not saved, sleep a while (SLEEP_TIME in ms) and auto-recall
+        // Do this for MAX_ITERATIONS times (?)
+        var SLEEP_TIME = 500;
+        var MAX_ITERATIONS = 20;
+        if (interactions === undefined) {
+            interactions = 0;
+        }
+        if (!SignSendButton.message_is_saved(button) && interactions < MAX_ITERATIONS) {
+            setTimeout(function () {
+                SignSendButton.on_click(event, interactions + 1);
+            }, SLEEP_TIME);
+            return;
+        }
+        var msg = {};
+        msg.command = "sign";
+        msg.id = draft_id;
+        msg.button_id = button.id;
+        Port.send(msg);
     },
 
     hide_compositor: function (button_id) {
@@ -157,96 +319,14 @@ var Utils = {
                 return;
             else {
                 discard = discard[0];
-                Utils.change_discard_alert();
+                Alert.replace_incoming_msg("Your message has been signed and sent. ");
                 discard.click();
                 break;
             }
         }
     },
-
-    alert: function (msg) {
-        var alert = document.getElementsByClassName(GOOGLE_CLASS_ALERT)[0];
-        var random_id = GOOPG_CLASS_ALERT + Math.random();
-        alert.innerHTML = '<span id="' + random_id + '">' + msg + '</span>';
-        // show the alert ; gmail hides this by setting top = -10000px over this container
-        var alert_container = alert.parentElement.parentElement;
-        alert_container.style.top = '0px';
-        // remove the alert after 15 s if still present
-        setTimeout(function () {
-            var this_alert = document.getElementById(random_id);
-            if (this_alert) {
-                var parent = this_alert.parentElement;
-                parent.removeChild(this_alert);
-                // revert
-                if (parent.children.length === 0) {
-                    alert_container.style.top = "-10000px";
-                }
-
-            }
-        }, 15000);
-
-    }
-
 };
 
-var web_port = null;
-
-function get_web_port() {
-
-    var goopgExtensionId = "ppopiamobkilibbniemlecehjmbfbjjp";
-    window.console.log("Connecting to web port...");
-    var port = window.chrome.runtime.connect(goopgExtensionId);
-
-    port.onDisconnect.addListener(function () {
-        window.console.log("Failed to connect: " + window.chrome.runtime.lastError.message);
-    });
-
-    port.onMessage.addListener(function (msg) {
-        //window.console.log("Received", msg);
-        // handle the message received
-        if (msg.command == 'request_init') {
-            send_message_web_port(get_init_command());
-        } else if (msg.command == "verify") {
-            if (msg.result.status === null)
-                return;
-            var div = document.getElementsByClassName("m" + msg.id)[0];
-            if (div === null)
-                return;
-            Utils.hide_signature(msg.result.filename, div);
-            div.insertBefore(Utils.build_message_sign_banner(msg.result), div.firstChild);
-        } else if (msg.command == "sign") {
-            if (msg.result === false) {
-                Utils.alert("Your message was not sent. Please retry.");
-                var button = document.getElementById(msg.button_id);
-                if (button) {
-                    button.addEventListener('click', on_click_sendsignbutton);
-                    button.style.color = "";
-                    button.innerHTML = "Sign and Send";
-                }
-            } else if (msg.result === true)
-                Utils.hide_compositor(msg.button_id);
-        }
-    });
-
-    return port;
-}
-
-function get_init_command() {
-    var init_command = {};
-    init_command.command = 'init';
-    init_command.options = {};
-    init_command.options.username = USERNAME;
-    return init_command;
-}
-
-function send_message_web_port(message) {
-    try {
-        web_port.postMessage(message);
-    } catch (err) {
-        web_port = get_web_port();
-        web_port.postMessage(message);
-    }
-}
 
 function look_for_signedmessages() {
     var messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
@@ -263,68 +343,12 @@ function look_for_signedmessages() {
             }
         }
         if (id) {
-            var info = {};
-            info.command = "verify";
-            info.id = id;
-            send_message_web_port(info);
+            var msg = {};
+            msg.command = "verify";
+            msg.id = id;
+            Port.send(msg);
         }
     }
-}
-
-// check if message is saved, starting from the sending button
-function message_is_saved(button) {
-    var tr = button.parentElement.parentElement.parentElement;
-    return tr.getElementsByClassName(GOOGLE_CLASS_MESSAGE_SAVED).length == 1;
-}
-
-function get_message_id(button) {
-    var e = button;
-    // get the message id, in html: <input name="draft" value="MSG_ID" />
-    while (e.parentElement) {
-        e = e.parentElement;
-        var inputs = e.getElementsByTagName('input');
-        for (var j = 0; j < inputs.length; j++) {
-            var input = inputs[j];
-            if (input.getAttribute('name') == "draft") {
-                return input.getAttribute('value');
-            }
-        }
-    }
-}
-
-function on_click_sendsignbutton(event, iterations) {
-    // the sending button
-    var button = event.target;
-    var draft_id = get_message_id(button);
-
-    if (draft_id == "undefined") {
-        Utils.alert("Please save the Draft before sending.");
-        return;
-    }
-    // prevent multi click
-    button.removeEventListener("click", on_click_sendsignbutton);
-    // stylish the button pressed
-    button.style.width = window.getComputedStyle(button).width;
-    button.style.color = "#999";
-    button.innerHTML = "Sending";
-    // If message is not saved, sleep a while (SLEEP_TIME in ms) and auto-recall
-    // Do this for MAX_ITERATIONS times (?)
-    var SLEEP_TIME = 500;
-    var MAX_ITERATIONS = 20;
-    if (iterations === undefined) {
-        iterations = 0;
-    }
-    if (!message_is_saved(button) && iterations < MAX_ITERATIONS) {
-        setTimeout(function () {
-            on_click_sendsignbutton(event, iterations + 1);
-        }, SLEEP_TIME);
-        return;
-    }
-    var info = {};
-    info.command = "sign";
-    info.id = draft_id;
-    info.button_id = button.id;
-    send_message_web_port(info);
 }
 
 function look_for_compositors() {
@@ -336,8 +360,8 @@ function look_for_compositors() {
         if (parent.className.indexOf(GOOPG_CLASS_CHECKED) > -1)
             continue;
         parent.className += ' ' + GOOPG_CLASS_CHECKED;
-        var new_button = Utils.build_sendbutton(button);
-        new_button.addEventListener("click", on_click_sendsignbutton);
+        var new_button = SignSendButton.get(button);
+        new_button.addEventListener("click", SignSendButton.on_click);
         parent.appendChild(new_button);
     }
 }
