@@ -55,8 +55,8 @@ def main():
         try:
             command = read_message()
         except struct.error, e:
-            logging.error("Error while reading stdin: \"{}\"".format(e.message))
-            logging.error("Exit 1")
+            logging.error("Error while reading stdin: \"{}\""
+                          " - Exit.".format(e.message))
             sys.exit(1)
         if not handler.initialized and command['command'] != 'init':
             queue_messages.append(command)
