@@ -87,9 +87,72 @@ class GPGMail(object):
         result['filename'] = filename
         return result
 
+    def _get_digest_algo(self, signature):
+        """
+        Returns a string representation of the digest algo used in signature.
+
+        Raises a TypeError if signature.hash_algo does not exists.
+
+        Acceptable values for signature.hash_algo are:
+            MD5       1
+            SHA1      2
+            RMD160    3
+            SHA256    8
+            SHA384    9
+            SHA512   10
+            SHA224   11
+        See gnupg/include/cipher.h for more info
+        """
+        values = {
+            1:  "MD5",
+            2:  "SHA1",
+            3:  "RMD160",
+            8:  "SHA256",
+            9:  "SHA384",
+            10: "SHA512",
+            11: "SHA224"
+        }
+        hash_algo = signature.hash_algo
+        try:
+            if isinstance(hash_algo, (str, unicode)):
+                hash_algo = int(hash_algo)
+            return values[hash_algo]
+        except:
+            raise TypeError("Invalid signature hash_algo {}".format(hash_algo))
+
     def sign(self, message):
         """Sign a email message and return the new message signed"""
-        new_message = MIMEMultipart(_subtype="signed", micalg="pgp-sha512",
+        # Create the basemsg, which contain the original message
+        # If original message has attachments, attach everything..
+        if message.get_content_type() == 'multipart/mixed':
+            basemsg = MIMEMultipart(_subtype='mixed')
+            for part in message.walk():
+                # the body message
+                if part.get_content_maintype() == 'text':
+                    basemsg.attach(MIMEUTF8QPText(part))
+                # the attachments
+                elif part.get('Content-Disposition'):
+                    basemsg.attach(part)
+        # else get only the body message
+        else:
+            basemsg = MIMEUTF8QPText(message)
+
+        # sign the original message
+        basetxt = basemsg.as_string()\
+                         .replace('\r\n', '\n')\
+                         .replace('\n', '\r\n')
+        signature = self.gpg.sign(basetxt, detach=True)
+
+        # create the signature message
+        sigmsg = Message()
+        sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
+                                 'name="signature.asc"'
+        sigmsg['Content-Description'] = 'GooPG digital signature'
+        sigmsg.set_payload(str(signature))
+
+        # create the new message
+        micalg = "pgp-{}".format(self._get_digest_algo(signature).lower())
+        new_message = MIMEMultipart(_subtype="signed", micalg=micalg,
                                     protocol="application/pgp-signature")
         header_to_copy = [
             "Date",
@@ -107,35 +170,9 @@ class GPGMail(object):
             if h in message:
                 new_message[h] = message[h]
 
-        # if has attachments, attach everything..
-        if message.get_content_type() == 'multipart/mixed':
-            basemsg = MIMEMultipart(_subtype='mixed')
-            for part in message.walk():
-                # the body message
-                if part.get_content_maintype() == 'text':
-                    basemsg.attach(MIMEUTF8QPText(part))
-                # the attachments
-                elif part.get('Content-Disposition'):
-                    basemsg.attach(part)
-        # else get only the body message
-        else:
-            basemsg = MIMEUTF8QPText(message)
-
-        # sign the message
-        basetxt = basemsg.as_string()\
-                         .replace('\r\n', '\n')\
-                         .replace('\n', '\r\n')
-        signature = str(self.gpg.sign(basetxt, detach=True))
-
         # attach the orig message
         new_message.attach(basemsg)
-
         # attach the signature
-        sigmsg = Message()
-        sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
-                                 'name="signature.asc"'
-        sigmsg['Content-Description'] = 'GooPG digital signature'
-        sigmsg.set_payload(signature)
         new_message.attach(sigmsg)
 
         return new_message
