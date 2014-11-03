@@ -11,6 +11,7 @@ var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
 var GOOPG_CLASS_ALERT = GOOPG_CLASS_PREFIX + "alert";
 var GOOPG_CLASS_KEYID = GOOPG_CLASS_PREFIX + "keyid-";
+var GOOPG_CLASS_MSG_SIGNINLINE = GOOPG_CLASS_PREFIX + 'signinline';
 
 
 // google css classes
@@ -163,17 +164,19 @@ function SignedMessage(msg_id) {
 
     // hide signature
     this.hide_signature = function (filename) {
+        function get_sign_inline_hook(text) {
+            return '<pre class="' + GOOPG_CLASS_MSG_SIGNINLINE + '">' + text + '</pre>';
+        }
         if (!this.exists())
             return;
         if (filename === undefined) {
             // Signature inline, try to hide it
             var body = this.div.firstChild.innerHTML;
-            var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
-            info = info[info.length - 1];
-            info = info.split(/^-+BEGIN PGP SIGNATURE-+<br>\n/m)[0];
-            if (info.length != this.div.firstChild.innerHTML.length) {
-                this.div.firstChild.innerHTML = info;
-                return true;
+            var reg = /-----BEGIN PGP SIGNED MESSAGE-----(?:<br>|\s)(?:.|\s)Hash.*(?:<br>|\s)+((?:.|\s)+)-----BEGIN PGP SIGNATURE-----(?:<br>|\s)(?:.|\s)+-----END PGP SIGNATURE-----(?:<br>)(?:.|\s)/m
+            if (reg.test(body)) {
+                var header = get_sign_inline_hook('-----BEGIN PGP SIGNED MESSAGE INLINE-----');
+                var footer = get_sign_inline_hook('-----END PGP SIGNED MESSAGE INLINE-----');
+                this.div.firstChild.innerHTML = body.replace(reg, header + ' $1 ' + footer);
             }
         } else {
             // Here only if signature is attached
@@ -183,7 +186,6 @@ function SignedMessage(msg_id) {
                 filename = 'noname';
             this.hide_attachment(filename);
         }
-        return false;
     };
 
     // get the attachments as HTML elements
