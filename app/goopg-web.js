@@ -130,11 +130,11 @@ var Port = {
         } else if (msg.command == "verify") {
             if (msg.result.status === null)
                 return;
-            var div = document.getElementsByClassName("m" + msg.id)[0];
-            if (div === null)
-                return;
-            SignedMessage.hide_signature(msg.result.filename, div);
-            div.insertBefore(SignedMessage.get_banner(msg.result), div.firstChild);
+            var signedmessage = new SignedMessage(msg.id);
+            if (signedmessage.exists()) {
+                signedmessage.hide_signature(msg.result.filename);
+                signedmessage.add_banner(msg.result);
+            }
         } else if (msg.command == "sign") {
             if (msg.result === false) {
                 Alert.set("Your message was not sent. Please retry.");
@@ -151,22 +151,32 @@ var Port = {
 };
 
 
-var SignedMessage = {
+function SignedMessage(msg_id) {
+
+    this.msg_id = msg_id;
+    this.div = document.getElementsByClassName("m" + msg_id)[0];
+
+    this.exists = function () {
+        return this.div !== null && this.div !== undefined;
+    };
+
     // hide signature
-    hide_signature: function (filename, div) {
+    this.hide_signature = function (filename) {
+        if (!this.exists())
+            return;
         if (filename === null) {
             // try to hide inline signature
-            var body = div.firstChild.innerHTML;
+            var body = this.div.firstChild.innerHTML;
             var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
             info = info[info.length - 1];
             info = info.split(/^-+BEGIN PGP SIGNATURE-+<br>\n/m)[0];
-            if (info.length != div.firstChild.innerHTML.length) {
-                div.firstChild.innerHTML = info;
+            if (info.length != this.div.firstChild.innerHTML.length) {
+                this.div.firstChild.innerHTML = info;
                 return true;
             }
         } else {
             // here only if signature is attached
-            var spans = div.parentElement.getElementsByTagName("span");
+            var spans = this.div.parentElement.getElementsByTagName("span");
             for (var i = 0; i < spans.length; i++) {
                 var span = spans[i];
                 var download_url = span.getAttribute("download_url");
@@ -183,26 +193,29 @@ var SignedMessage = {
             }
         }
         return false;
-    },
+    };
+
     // build the banner
-    get_banner: function (msg) {
+    this.add_banner = function (gpg) {
+        if (!this.exists())
+            return;
         var className;
         var text;
         var icon;
-        if (msg.status === null)
+        if (gpg.status === null)
             return;
-        var key_id = msg.key_id;
+        var key_id = gpg.key_id;
         if (key_id.length > 8)
-            key_id = msg.key_id.substring(8);
-        text = msg.username + " " + key_id;
-        if (msg.status == "no public key") {
+            key_id = gpg.key_id.substring(8);
+        text = gpg.username + " " + key_id;
+        if (gpg.status == "no public key") {
             icon = "question-sign";
             className = "warning";
             text = "public key " + key_id + " not found";
-        } else if (msg.status == "signature valid" || msg.status == "signature good") {
+        } else if (gpg.status == "signature valid" || gpg.status == "signature good") {
             icon = "ok-sign";
             className = "success";
-        } else { // (msg.status == "signature bad")
+        } else { // (gpg.status == "signature bad")
             icon = "exclamation-sign";
             className = "danger";
         }
@@ -215,10 +228,10 @@ var SignedMessage = {
         alert_header.className = "alert-header";
         alert_header.innerHTML =
             "<span class=\"pull-right glyphicon glyphicon-" + icon + "\"></span>" +
-            "<strong>" + Utils.capitalize(msg.status) + ":</strong> " + Utils.escape_html(text);
+            "<strong>" + Utils.capitalize(gpg.status) + ":</strong> " + Utils.escape_html(text);
         alert.appendChild(alert_header);
-        if (msg.stderr) {
-            var stderr = msg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
+        if (gpg.stderr) {
+            var stderr = gpg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
             alert_header.addEventListener("click", function () {
                 Utils.toggle_display(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
             });
@@ -230,9 +243,9 @@ var SignedMessage = {
         }
 
         result.appendChild(alert);
-        return result;
-    },
-};
+        this.div.insertBefore(result, this.div.firstChild);
+    };
+}
 
 
 
