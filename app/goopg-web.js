@@ -230,13 +230,22 @@ function SignedMessage(msg_id) {
         if (key_id.length > 8)
             key_id = key_id.substring(8);
 
-        var text = gpg.username + " " + key_id;
+        var text = [];
+
+        if (gpg.username !== null)
+            text.push(gpg.username);
+        if (key_id)
+            text.push(key_id);
+        if (gpg.key_status)
+            text.push("• " + gpg.key_status);
+
+        text = text.join(' ');
 
         if (gpg.status == "no public key") {
             icon = "question-sign";
             className = "warning";
             text = "public key " + key_id + " not found";
-        } else if (gpg.status == "signature valid" || gpg.status == "signature good") {
+        } else if (gpg.valid) {
             icon = "ok-sign";
             className = "success";
         } else { // (gpg.status == "signature bad")
