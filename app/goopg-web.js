@@ -164,7 +164,7 @@ function SignedMessage(msg_id) {
     this.hide_signature = function (filename) {
         if (!this.exists())
             return;
-        if (filename === null) {
+        if (filename === undefined) {
             // try to hide inline signature
             var body = this.div.firstChild.innerHTML;
             var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
@@ -175,13 +175,16 @@ function SignedMessage(msg_id) {
                 return true;
             }
         } else {
+            // if signature attached has no name, gmail show it as a 'noname' attachment
+            if (filename === null)
+                filename = 'noname';
             // here only if signature is attached
             var spans = this.div.parentElement.getElementsByTagName("span");
+            var download_url_regex = new RegExp(':' + filename + ':https://mail.google.com/');
             for (var i = 0; i < spans.length; i++) {
                 var span = spans[i];
                 var download_url = span.getAttribute("download_url");
-                if (download_url &&
-                    download_url.indexOf("text/plain:" + filename) === 0) {
+                if (download_url && download_url.match(download_url_regex)) {
                     // this is the sign attachment
                     span.style.display = "none";
                     if (span.parentElement.children.length == 2) {
