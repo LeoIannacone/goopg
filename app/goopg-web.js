@@ -202,11 +202,11 @@ function SignedMessage(msg_id) {
     this.add_banner = function (gpg) {
         if (!this.exists())
             return;
+        if (gpg.status === undefined || gpg.status === null)
+            return;
         var className;
         var text;
         var icon;
-        if (gpg.status === null)
-            return;
         var key_id = gpg.key_id;
         if (key_id.length > 8)
             key_id = gpg.key_id.substring(8);
@@ -222,31 +222,35 @@ function SignedMessage(msg_id) {
             icon = "exclamation-sign";
             className = "danger";
         }
-        // clean stderr
-        var result = document.createElement("div");
-        result.className = "goopg";
-        var alert = document.createElement("div");
-        alert.className = "alert alert-" + className;
-        var alert_header = document.createElement("div");
-        alert_header.className = "alert-header";
-        alert_header.innerHTML =
+
+        // build the banner
+        var banner = document.createElement("div");
+        banner.className = "alert alert-" + className;
+
+        var header = document.createElement("div");
+        header.className = "alert-header";
+        header.innerHTML =
             "<span class=\"pull-right glyphicon glyphicon-" + icon + "\"></span>" +
             "<strong>" + Utils.capitalize(gpg.status) + ":</strong> " + Utils.escape_html(text);
-        alert.appendChild(alert_header);
+        banner.appendChild(header);
+
         if (gpg.stderr) {
-            var stderr = gpg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
-            alert_header.addEventListener("click", function () {
+            var stderr = document.createElement("div");
+            var gpg_stderr_clean = gpg.stderr.replace(/^.GNUPG:.*\n?/mg, "");
+            stderr.className = "raw " + GOOPG_CLASS_STDERR;
+            stderr.style.display = "none";
+            header.addEventListener("click", function () {
                 Utils.toggle_display(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
             });
-            var alert_stderr = document.createElement("div");
-            alert_stderr.className = "raw " + GOOPG_CLASS_STDERR;
-            alert_stderr.style.display = "none";
-            alert_stderr.innerHTML = Utils.escape_html(stderr);
-            alert.appendChild(alert_stderr);
+            stderr.innerHTML = Utils.escape_html(gpg_stderr_clean);
+            banner.appendChild(stderr);
         }
 
-        result.appendChild(alert);
-        this.div.insertBefore(result, this.div.firstChild);
+        // wrap the banner
+        var wrapper = document.createElement("div");
+        wrapper.className = "goopg";
+        wrapper.appendChild(banner);
+        this.div.insertBefore(wrapper, this.div.firstChild);
     };
 }
 
