@@ -64,19 +64,19 @@ class GPGMail(object):
                     sign_type = signature.get_content_type()
                     if sign_type == 'application/pgp-signature':
                         s = self._armor(part, signed_part, signature)
-                        yield self.gpg.verify(s), signature.get_filename()
+                        yield self.gpg.verify(s), True, signature.get_filename()
 
                 except ValueError:
                     pass
 
             else:
                 payload = part.get_payload(decode=True)
-                yield self.gpg.verify(payload), None
+                yield self.gpg.verify(payload), False, None
 
     def verify(self, message):
         """Verify signature of a email message and returns the GPG info"""
         result = {}
-        for verified, filename in self._signed_parts(message):
+        for verified, sign_attached, filename in self._signed_parts(message):
             if verified is not None:
                 result = verified.__dict__
                 break
@@ -84,7 +84,8 @@ class GPGMail(object):
             return None
         if 'gpg' in result:
             del(result['gpg'])
-        result['filename'] = filename
+        if sign_attached:
+            result['filename'] = filename
         return result
 
     def _get_digest_algo(self, signature):
