@@ -165,7 +165,7 @@ function SignedMessage(msg_id) {
         if (!this.exists())
             return;
         if (filename === undefined) {
-            // try to hide inline signature
+            // Signature inline, try to hide it
             var body = this.div.firstChild.innerHTML;
             var info = body.split(/^-+BEGIN PGP SIGNED MESSAGE-+.*\n.*\n<br>\n+/m);
             info = info[info.length - 1];
@@ -175,27 +175,38 @@ function SignedMessage(msg_id) {
                 return true;
             }
         } else {
-            // if signature attached has no name, gmail show it as a 'noname' attachment
+            // Here only if signature is attached
+            // If the signature is attached with no name,
+            // gmail will show it as a 'noname' attachment, so set ...
             if (filename === null)
                 filename = 'noname';
-            // here only if signature is attached
-            var spans = this.div.parentElement.getElementsByTagName("span");
-            var download_url_regex = new RegExp(':' + filename + ':https://mail.google.com/');
-            for (var i = 0; i < spans.length; i++) {
-                var span = spans[i];
-                var download_url = span.getAttribute("download_url");
-                if (download_url && download_url.match(download_url_regex)) {
-                    // this is the sign attachment
-                    span.style.display = "none";
-                    if (span.parentElement.children.length == 2) {
-                        // only one attachment, hide the whole box
-                        span.parentElement.parentElement.style.display = "none";
-                    }
-                    return true;
-                }
-            }
+            this.hide_attachment(filename);
         }
         return false;
+    };
+
+    // get the attachments as HTML elements
+    this.get_attachments = function () {
+        return this.div.parentElement.getElementsByTagName("span");
+    };
+
+    // hide an attachment given a filename
+    this.hide_attachment = function (filename) {
+        var attachments = this.get_attachments();
+        var url_regex = new RegExp(':' + filename + ':https://mail.google.com/');
+        for (var i = 0; i < attachments.length; i++) {
+            var attach = attachments[i];
+            var download_url = attach.getAttribute("download_url");
+            if (download_url && download_url.match(url_regex)) {
+                // this is the sign attachment
+                attach.style.display = "none";
+                if (attach.parentElement.children.length == 2) {
+                    // it was only one attachment, hide the whole attachments box
+                    attach.parentElement.parentElement.style.display = "none";
+                }
+                return true;
+            }
+        }
     };
 
     // build the banner
