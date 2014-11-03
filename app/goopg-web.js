@@ -10,6 +10,7 @@ var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
 var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
 var GOOPG_CLASS_ALERT = GOOPG_CLASS_PREFIX + "alert";
+var GOOPG_CLASS_KEYID = GOOPG_CLASS_PREFIX + "keyid-";
 
 
 // google css classes
@@ -215,13 +216,20 @@ function SignedMessage(msg_id) {
             return;
         if (gpg.status === undefined || gpg.status === null)
             return;
+
         var className;
-        var text;
         var icon;
+
         var key_id = gpg.key_id;
+        // // show the whole key and add a space every 4 chars
+        // key_id = key_id.replace(/(.{4})/g, "$1 ");
+
+        // show only last 8 chars for key id
         if (key_id.length > 8)
-            key_id = gpg.key_id.substring(8);
-        text = gpg.username + " " + key_id;
+            key_id = key_id.substring(8);
+
+        var text = gpg.username + " " + key_id;
+
         if (gpg.status == "no public key") {
             icon = "question-sign";
             className = "warning";
@@ -262,6 +270,10 @@ function SignedMessage(msg_id) {
         wrapper.className = "goopg";
         wrapper.appendChild(banner);
         this.div.insertBefore(wrapper, this.div.firstChild);
+
+        var class_keyid = GOOPG_CLASS_KEYID + gpg.key_id;
+        if (!this.div.classList.contains(class_keyid))
+            this.div.classList.add(class_keyid);
     };
 }
 
