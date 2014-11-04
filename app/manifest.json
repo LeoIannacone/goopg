@@ -35,6 +35,7 @@
 
     "web_accessible_resources": [
         "goopg-web.js",
+        "goopg-web-extension-id.js",
         "lib/fonts/glyphicons-halflings-regular.eot",
         "lib/fonts/glyphicons-halflings-regular.svg",
         "lib/fonts/glyphicons-halflings-regular.ttf",

@@ -45,7 +45,7 @@ Once extension is installed, get the `NEW_ID` extension in chrome://extension an
 ```bash
 NEW_ID=the_id_you_found
 OLD_ID=ppopiamobkilibbniemlecehjmbfbjjp
-sed s/$OLD_ID/$NEW_ID/ -i app/goopg-web.js host/com.leoiannacone.goopg.json
+sed s/$OLD_ID/$NEW_ID/ -i app/goopg-web-extension-id.js host/com.leoiannacone.goopg.json
 ```
 
 # Install the host

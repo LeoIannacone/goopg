@@ -1,8 +1,15 @@
 "use strict";
-var script = document.createElement("script");
-script.type = "text/javascript";
-script.src = window.chrome.extension.getURL("goopg-web.js");
-document.getElementsByTagName("head")[0].appendChild(script);
+
+
+function add_javascript_to_head(filename) {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = window.chrome.extension.getURL(filename);
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+add_javascript_to_head('goopg-web-extension-id.js');
+add_javascript_to_head('goopg-web.js');
 
 
 

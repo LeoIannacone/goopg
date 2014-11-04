@@ -96,10 +96,9 @@ var Alert = {
 var Port = {
     // return a new port
     get: function () {
-        var goopgExtensionId = "ppopiamobkilibbniemlecehjmbfbjjp";
         window.console.log("Connecting to web port...");
 
-        var port = window.chrome.runtime.connect(goopgExtensionId);
+        var port = window.chrome.runtime.connect(GOOPG_EXTENSION_ID);
 
         port.onDisconnect.addListener(function () {
             window.console.log("Failed to connect: " + window.chrome.runtime.lastError.message);
