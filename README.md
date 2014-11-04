@@ -1,6 +1,6 @@
-![logo.png](https://bitbucket.org/repo/on9K89/images/2089013194-logo.png)
-
 # GPG for GMail #
+
+![logo.png](http://people.ubuntu.com/~l3on/goopg/logo-50perc.png)
 
 # Intro #
 
