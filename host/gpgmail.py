@@ -15,6 +15,9 @@ class GPGMail(object):
         self.gpg = GPG(use_agent=True)
 
     def _armor(self, container, message, signature):
+        """
+        Make the armor signed message
+        """
         if container.get_param('protocol') == 'application/pgp-signature':
             m = re.match(r'^pgp-(.*)$', container.get_param('micalg'))
 
@@ -122,8 +125,13 @@ class GPGMail(object):
             raise TypeError("Invalid signature hash_algo {}".format(hash_algo))
 
     def sign(self, message):
-        """Sign a email message and return the new message signed"""
-        # Create the basemsg, which contain the original message
+        """Sign a email message and return the new message signed as string"""
+
+        if isinstance(message, (str, unicode)):
+            message = email.message_from_string(message)
+
+        # Create the basemsg, which contains the original message
+
         # If original message has attachments, attach everything..
         if message.get_content_type() == 'multipart/mixed':
             basemsg = MIMEMultipart(_subtype='mixed')
@@ -138,23 +146,32 @@ class GPGMail(object):
         else:
             basemsg = MIMEUTF8QPText(message)
 
-        # sign the original message
-        basetxt = basemsg.as_string()\
-                         .replace('\r\n', '\n')\
+        # Get to body of the original message to sign
+        basetxt = basemsg.as_string()
+
+        # See RFC 3156 (Section 5.) to understand these transformations
+        # 1. all the lines must end with <CR><LF>
+        basetxt = basetxt.replace('\r\n', '\n')\
                          .replace('\n', '\r\n')
+        # 2. remove trailing spaces
+        basetxt = re.sub(r' +\r\n', '\r\n', basetxt, flags=re.M)
+
+        # signing
         signature = self.gpg.sign(basetxt, detach=True)
 
-        # create the signature message
+        # create the signature attachment
         sigmsg = Message()
         sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
                                  'name="signature.asc"'
         sigmsg['Content-Description'] = 'GooPG digital signature'
         sigmsg.set_payload(str(signature))
 
-        # create the new message
+        # create the new message as multipart/signed (see RFC 3156)
         micalg = "pgp-{}".format(self._get_digest_algo(signature).lower())
         new_message = MIMEMultipart(_subtype="signed", micalg=micalg,
                                     protocol="application/pgp-signature")
+
+        # copy the headers
         header_to_copy = [
             "Date",
             "Subject",
@@ -171,18 +188,40 @@ class GPGMail(object):
             if h in message:
                 new_message[h] = message[h]
 
-        # attach the orig message
-        new_message.attach(basemsg)
+        # attach signed_part and signature and return message as string
+        return self._attach_signed_parts(new_message, basetxt, sigmsg)
+
+    def _attach_signed_parts(self, message, signed_part, signature):
+        """
+        Attach the signed_part (str) and signature (email.Message)
+        to the message (email.Message) and returns the new message as str
+        """
+        # According with RFC 3156 the signed_part in the message
+        # must be equal to the signed one.
+        # The best way to do this is "hard" attach the parts
+        # using strings.
+
+        # get the body of Multipart message,
+        # remove last lines which close the boundary
+        msg_lines = message.as_string().split('\n')[:-3]
+        # get the opening boundary
+        boundary = msg_lines.pop()
+        # attach the signed part
+        msg_lines += [boundary, signed_part]
         # attach the signature
-        new_message.attach(sigmsg)
+        msg_lines += [boundary,
+                      signature.as_string(),
+                      '{}--'.format(boundary)]
+        # return message a string
+        return '\n'.join(msg_lines)
 
-        return new_message
 
-
-# This class is used to have a message with:
-#  Content-Transfer-Encoding: quoted-printable
-# It's required in RFC 3156
 class MIMEUTF8QPText(MIMENonMultipart):
+    """
+    This class is used to have a message with:
+      Content-Transfer-Encoding: quoted-printable
+    As required in RFC 3156
+    """
     def __init__(self, message):
         MIMENonMultipart.__init__(self, 'text', 'plain',
                                   charset='utf-8')

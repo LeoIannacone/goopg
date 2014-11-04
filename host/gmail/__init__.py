@@ -129,14 +129,21 @@ class GMail():
         #             draft_id = draft['id']
         #             self.drafts.delete(userId='me', id=draft_id).execute()
         #             break
-        sender = message['From']
-        receiver = message['To']
+        if isinstance(message, (str, unicode)):
+            msg = email.message_from_string(message)
+            sender = msg['From']
+            receiver = msg['To']
+            msg = message
+        else:
+            sender = message['From']
+            receiver = message['To']
+            msg = message.as_string()
         if sender is None:
             raise TypeError("sender is None")
         if receiver is None:
             raise TypeError("receiver is None")
         try:
-            self.smtp.sendmail(sender, receiver, message.as_string())
+            self.smtp.sendmail(sender, receiver, msg)
         except SMTPServerDisconnected:
             self._smtp_login()
-            self.smtp.sendmail(sender, receiver, message.as_string())
+            self.smtp.sendmail(sender, receiver, msg)
