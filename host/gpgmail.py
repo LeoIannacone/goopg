@@ -130,24 +130,21 @@ class GPGMail(object):
         if isinstance(message, (str, unicode)):
             message = email.message_from_string(message)
 
-        # Create the basemsg, which contains the original message
+        # Create the basetxt, which contains the original body message
 
-        # If original message has attachments, attach everything..
-        if message.get_content_type() == 'multipart/mixed':
-            basemsg = MIMEMultipart(_subtype='mixed')
-            for part in message.walk():
-                # the body message
-                if part.get_content_maintype() == 'text':
-                    basemsg.attach(MIMEUTF8QPText(part))
-                # the attachments
-                elif part.get('Content-Disposition'):
-                    basemsg.attach(part)
+        # If original message is multipart, take the
+        # Content-Type and the Body - ignore other Headers..
+        if message.is_multipart():
+            content_type = 'Content-Type: {}'.format(message['Content-Type'])
+            try:
+                body = self._flatten(message).split('\n\n', 1)[1]
+            except:
+                raise ValueError("Message cannot be split in Headers and Body")
+            basetxt = '{}\n\n{}'.format(content_type, body)
+
         # else get only the body message
         else:
-            basemsg = MIMEUTF8QPText(message)
-
-        # Get to body of the original message to sign
-        basetxt = basemsg.as_string()
+            basetxt = MIMEUTF8QPText(message).as_string()
 
         # See RFC 3156 (Section 5.) to understand these transformations
         # 1. all the lines must end with <CR><LF>
