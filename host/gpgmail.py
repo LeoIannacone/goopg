@@ -159,13 +159,6 @@ class GPGMail(object):
         # signing
         signature = self.gpg.sign(basetxt, detach=True)
 
-        # create the signature attachment
-        sigmsg = Message()
-        sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
-                                 'name="signature.asc"'
-        sigmsg['Content-Description'] = 'GooPG digital signature'
-        sigmsg.set_payload(str(signature))
-
         # create the new message as multipart/signed (see RFC 3156)
         micalg = "pgp-{}".format(self._get_digest_algo(signature).lower())
         new_message = MIMEMultipart(_subtype="signed", micalg=micalg,
@@ -189,28 +182,40 @@ class GPGMail(object):
                 new_message[h] = message[h]
 
         # attach signed_part and signature and return message as string
-        return self._attach_signed_parts(new_message, basetxt, sigmsg)
+        return self._attach_signed_parts(new_message, basetxt, signature)
 
     def _attach_signed_parts(self, message, signed_part, signature):
         """
-        Attach the signed_part (str) and signature (email.Message)
-        to the message (email.Message) and returns the new message as str
+        Attach the signed_part and signature to the message (MIMEMultipart)
+        and returns the new message as str
         """
         # According with RFC 3156 the signed_part in the message
         # must be equal to the signed one.
         # The best way to do this is "hard" attach the parts
         # using strings.
 
-        # get the body of Multipart message,
+        if not isinstance(signature, (str, unicode)):
+            signature = str(signature)
+
+        # get the body of the MIMEMultipart message,
         # remove last lines which close the boundary
         msg_lines = message.as_string().split('\n')[:-3]
-        # get the opening boundary
+
+        # get the last opening boundary
         boundary = msg_lines.pop()
-        # attach the signed part
+
+        # create the signature as attachment
+        sigmsg = Message()
+        sigmsg['Content-Type'] = 'application/pgp-signature; ' + \
+                                 'name="signature.asc"'
+        sigmsg['Content-Description'] = 'GooPG digital signature'
+        sigmsg.set_payload(signature)
+
+        # attach the signed_part
         msg_lines += [boundary, signed_part]
         # attach the signature
         msg_lines += [boundary,
-                      signature.as_string(),
+                      sigmsg.as_string(),
                       '{}--'.format(boundary)]
         # return message a string
         return '\n'.join(msg_lines)
