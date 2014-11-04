@@ -2,8 +2,6 @@
 
 ![logo.png](http://people.ubuntu.com/~l3on/goopg/logo-50perc.png)
 
-# Intro #
-
 **WARN**: This is an alpha version.
 
 ### *What you can do:* ###
@@ -11,7 +9,7 @@
 * Recruit alpha-testers:
 
  * requirements: must be developers (or something like that)
- * how: send to l3on@ubuntu.com the bitbucket account request
+ * how: send to l3on@ubuntu.com the github account request
 
 
 ### Wath you cannot do: ###
