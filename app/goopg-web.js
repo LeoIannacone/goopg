@@ -172,7 +172,11 @@ function SignedMessage(msg_id) {
         if (filename === undefined) {
             // Signature inline, try to hide it
             var body = this.div.firstChild.innerHTML;
-            var reg = /-----BEGIN PGP SIGNED MESSAGE-----.*\nHash.*\n.*\n((.*\n)+)-----BEGIN PGP SIGNATURE-----(.*\n)+-----END PGP SIGNATURE-----.*\n/m;
+            // stricty_reg to check PGP signed inline with HTML trailing <br> elements
+            // var strinct_reg = /-----BEGIN PGP SIGNED MESSAGE-----.*\nHash.*\n.*\n((.*\n)+)-----BEGIN PGP SIGNATURE-----(.*\n)+-----END PGP SIGNATURE-----.*\n/m;
+            // permissive_reg is a strinct_reg which allows any HTML code before the PGP signature (need tests)
+            var permissive_reg = /-----BEGIN PGP SIGNED MESSAGE-----.*\n.*Hash.*\n.*\n((.*\n)+).*-----BEGIN PGP SIGNATURE-----(.*\n)+.*-----END PGP SIGNATURE-----.*\n/m;
+            var reg = permissive_reg;
             if (reg.test(body)) {
                 var header = get_sign_inline_hook('-----BEGIN PGP SIGNED MESSAGE INLINE-----');
                 var footer = get_sign_inline_hook('-----END PGP SIGNED MESSAGE INLINE-----');
