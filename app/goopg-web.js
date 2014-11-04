@@ -401,6 +401,10 @@ function look_for_signedmessages() {
         }
         if (id) {
             var msg = {};
+            // guess if message is GPG signed inline
+            var body = messages[i].innerText;
+            if (body.indexOf('-----BEGIN PGP SIGNATURE-----') >= 0)
+                msg.force = true;
             msg.command = "verify";
             msg.id = id;
             Port.send(msg);

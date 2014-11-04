@@ -34,8 +34,18 @@ class CommandHandler(object):
     def verify(self, message):
         if not self.initialized:
             return False
-        mail = self.gmail.get(message["id"])
-        return self.gpgmail.verify(mail)
+        id = message['id']
+        # check the message only if message['force']
+        check = message['force'] if 'force' in message else False
+        # or content_type of message contains 'multipart/signed'
+        if not check:
+            content_type = self.gmail.get_header(id, 'Content-Type')
+            check = content_type.find('multipart/signed') >= 0
+
+        if check:
+            mail = self.gmail.get(id)
+            return self.gpgmail.verify(mail)
+        return None
 
     def sign(self, message):
         if not self.initialized or not message["id"]:

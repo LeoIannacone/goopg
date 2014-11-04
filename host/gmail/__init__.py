@@ -72,6 +72,9 @@ class GMail():
         self._smtp_login()
 
     def _gmail_API_login(self):
+        """
+        Login in GMail APIs
+        """
         self._refresh_credentials()
 
         # Authorize the httplib2.Http object with our credentials
@@ -88,6 +91,9 @@ class GMail():
             self.credentials.refresh(self.http)
 
     def _smtp_login(self):
+        """
+        Loging in GMail smtp
+        """
         self._refresh_credentials()
 
         # intialize SMTP procedure
@@ -108,11 +114,31 @@ class GMail():
         self.smtp.send("\r\n")
 
     def get(self, id):
+        """
+        Get a Message from the GMail message id (as known as X-GM-MSGID)
+        """
         # this return a message.raw in url safe base64
         message = self.messages.get(userId='me', id=id, format='raw').execute()
         # decode it
         message = base64.urlsafe_b64decode(str(message['raw']))
         return email.message_from_string(message)
+
+    def get_header(self, id, header):
+        """
+        Get the specified header of a GMail message id (as known as X-GM-MSGID).
+        Returns None if header not found.
+        """
+        message = self.messages.get(userId='me',
+                                    id=id,
+                                    format='metadata',
+                                    metadataHeaders=header).execute()
+
+        try:
+            for header_msg in message['payload']['headers']:
+                if header_msg['name'] == header:
+                    return header_msg['value']
+        except:
+            return None
 
     def send(self, id, message, delete_draft=True):
         # APIs do not work
