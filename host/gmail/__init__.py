@@ -195,10 +195,10 @@ class GMail():
         # self.messages.send(userId='me', body=body).execute()
 
         if isinstance(message, (str, unicode)):
-            msg = message
+            msg_str = message
             message = email.message_from_string(message)
         else:
-            msg = message.as_string()
+            msg_str = message.as_string()
 
         sender, receivers = self._get_sender_and_receivers(message)
 
@@ -208,10 +208,10 @@ class GMail():
             raise ValueError("receiver is None")
 
         if 'Bcc' in message:
-            msg = self._remove_bcc_from_header(msg)
+            msg_str = self._remove_bcc_from_header(msg_str)
 
         try:
-            self.smtp.sendmail(sender, receivers, msg)
+            self.smtp.sendmail(sender, receivers, msg_str)
         except SMTPServerDisconnected:
             self._smtp_login()
-            self.smtp.sendmail(sender, receivers, msg)
+            self.smtp.sendmail(sender, receivers, msg_str)
