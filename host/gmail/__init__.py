@@ -142,6 +142,10 @@ class GMail():
 
     @staticmethod
     def _get_sender_and_receivers(message):
+        """
+        Get the sender and receivers from messaage (email.Message)
+        Receivers are defined into To, Cc and Bcc message header
+        """
         receivers = []
         for header in ['To', 'Cc', 'Bcc']:
             if header in message:
@@ -153,6 +157,36 @@ class GMail():
         receivers = [r.strip() for r in receivers]
 
         return sender, receivers
+
+    @staticmethod
+    def _remove_bcc_from_header(message):
+        """
+        Return a new message (str) without the Bcc field
+        """
+
+        if not isinstance(message, (str, unicode)):
+            message = message.as_string()
+
+        # slipt the message in header and body
+        header, body = message.split('\n\n', 1)
+
+        # check for Bcc in headers and remove it
+        headers = header.split('\n')
+        for i in range(0, len(headers)):
+            line = headers[i]
+            if line.find('Bcc:') == 0:
+                headers.pop(i)
+                # check if next lines start with ' ', which means
+                # Bcc field is continuing, and remove them
+                i += 1
+                max_length = len(headers)
+                while(i < max_length and headers[i].find(' ') == 0):
+                    headers.pop(i)
+                break
+        header = '\n'.join(headers)
+
+        # return the new message
+        return '\n\n'.join([header, body])
 
     def send(self, id, message, delete_draft=True):
         # APIs do not work
@@ -181,6 +215,9 @@ class GMail():
             raise ValueError("sender is None")
         if receivers is None:
             raise ValueError("receiver is None")
+
+        if 'Bcc' in message:
+            msg = self._remove_bcc_from_header(msg)
 
         try:
             self.smtp.sendmail(sender, receivers, msg)
