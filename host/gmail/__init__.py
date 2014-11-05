@@ -193,16 +193,7 @@ class GMail():
         # raw = base64.urlsafe_b64encode(message.as_string())
         # body = {'raw': raw}
         # self.messages.send(userId='me', body=body).execute()
-        # if delete_draft:
-        #     response = self.drafts.list(userId='me').execute()
-        #     drafts = response['drafts']
-        #     draft_id = None
-        #     for draft in drafts:
-        #         if draft['message']['id'] == id:
-        #             #print "deleting draft %s" % draft_id
-        #             draft_id = draft['id']
-        #             self.drafts.delete(userId='me', id=draft_id).execute()
-        #             break
+
         if isinstance(message, (str, unicode)):
             msg = message
             message = email.message_from_string(message)
