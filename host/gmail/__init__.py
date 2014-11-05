@@ -140,6 +140,20 @@ class GMail():
         except:
             return None
 
+    @staticmethod
+    def _get_sender_and_receivers(message):
+        receivers = []
+        for header in ['To', 'Cc', 'Bcc']:
+            if header in message:
+                receivers.append(message[header])
+
+        sender = message['From']
+        receivers = ','.join(receivers).split(',')
+        # strip receives
+        receivers = [r.strip() for r in receivers]
+
+        return sender, receivers
+
     def send(self, id, message, delete_draft=True):
         # APIs do not work
         # raw = base64.urlsafe_b64encode(message.as_string())
@@ -156,20 +170,20 @@ class GMail():
         #             self.drafts.delete(userId='me', id=draft_id).execute()
         #             break
         if isinstance(message, (str, unicode)):
-            msg = email.message_from_string(message)
-            sender = msg['From']
-            receiver = msg['To']
             msg = message
+            message = email.message_from_string(message)
         else:
-            sender = message['From']
-            receiver = message['To']
             msg = message.as_string()
+
+        sender, receivers = self._get_sender_and_receivers(message)
+
         if sender is None:
-            raise TypeError("sender is None")
-        if receiver is None:
-            raise TypeError("receiver is None")
+            raise ValueError("sender is None")
+        if receivers is None:
+            raise ValueError("receiver is None")
+
         try:
-            self.smtp.sendmail(sender, receiver, msg)
+            self.smtp.sendmail(sender, receivers, msg)
         except SMTPServerDisconnected:
             self._smtp_login()
-            self.smtp.sendmail(sender, receiver, msg)
+            self.smtp.sendmail(sender, receivers, msg)
