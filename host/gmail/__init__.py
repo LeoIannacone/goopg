@@ -140,6 +140,31 @@ class GMail():
         except:
             return None
 
+    def message_match(self, id, query):
+        """
+        Check if the GMail message id (as known as X-GM-MSGID) matches
+        the query.
+
+        Query is defined as the same str used in the GMail search box:
+        https://support.google.com/mail/answer/7190
+        """
+        # get the real Message-ID
+        rfc822msgid = self.get_header(id, 'Message-ID')
+        if rfc822msgid:
+            # build the query adding the Message-ID
+            q = "rfc822msgid:{} {}".format(rfc822msgid, query)
+            found = self.messages.list(userId='me',
+                                       includeSpamTrash=True,
+                                       q=q,
+                                       fields='messages').execute()
+            if 'messages' in found:
+                for m in found['messages']:
+                    if m['id'] == id:
+                        # if the messages here have the same id
+                        # it means they match successful
+                        return True
+        return False
+
     @staticmethod
     def _get_sender_and_receivers(message):
         """
