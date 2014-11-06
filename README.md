@@ -31,7 +31,7 @@ sudo apt-get install node-less python-googleapi python-gflags python-xdg python-
 # Build the css #
 ```bash
 cd app/lib
-bash Makefile
+make
 cd -
 ```
 
