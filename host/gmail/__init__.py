@@ -180,10 +180,11 @@ class GMail():
                                        q=q,
                                        fields='messages').execute()
             # look for the same message id in found
-            for m in found['messages']:
-                if m['id'] == id:
-                    result = True
-                    break
+            if 'messages' in found:
+                for m in found['messages']:
+                    if m['id'] == id:
+                        result = True
+                        break
 
         self.logger.info('message {} matches the query: {} - [{}]'
                          .format(id, query, result))
