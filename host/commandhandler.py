@@ -12,37 +12,37 @@ class CommandHandler(object):
         self.initialized = False
         self.logger = logging.getLogger('CommandHandler')
 
-    def parse(self, message):
+    def parse(self, bundle):
         result = None
-        command = message["command"]
+        command = bundle["command"]
         if command == 'init':
-            result = self.init(message)
+            result = self.init(bundle)
         elif command == 'verify':
-            result = self.verify(message)
+            result = self.verify(bundle)
         elif command == 'sign':
-            result = self.sign(message)
+            result = self.sign(bundle)
         return result
 
-    def init(self, message):
-        if not 'options' in message and not 'username' in message['options']:
+    def init(self, bundle):
+        if not 'options' in bundle and not 'username' in bundle['options']:
             return False
         self.gpgmail = GPGMail()
-        self.gmail = GMail(message['options']['username'])
+        self.gmail = GMail(bundle['options']['username'])
         self.initialized = True
         return True
 
-    def verify(self, message):
+    def verify(self, bundle):
         if not self.initialized:
             return False
 
-        id = message['id']
+        id = bundle['id']
 
         def _verify():
             mail = self.gmail.get(id)
             return self.gpgmail.verify(mail)
 
-        # verify the message only if message['force'] = true
-        if 'force' in message and message['force']:
+        # verify the message only if bundle['force'] = true
+        if 'force' in bundle and bundle['force']:
             return _verify()
 
         # or content_type of message is 'multipart/signed'
@@ -63,15 +63,15 @@ class CommandHandler(object):
         # else
         return None
 
-    def sign(self, message):
-        if not self.initialized or not message["id"]:
+    def sign(self, bundle):
+        if not self.initialized or not bundle["id"]:
             return False
         result = False
         try:
-            draft = self.gmail.get(message["id"])
+            draft = self.gmail.get(bundle["id"])
             new_message = self.gpgmail.sign(draft)
             if new_message:
-                self.gmail.send(message["id"], new_message)
+                self.gmail.send(bundle["id"], new_message)
                 result = True
         except Exception, e:
             self.logger.exception(e)

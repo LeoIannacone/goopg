@@ -49,29 +49,29 @@ def main():
     # send init request
     send_message({"command": "request_init"})
 
-    # a queue to store messages received before the 'init' command
+    # a queue to store messages received before the 'init' bundle
     queue_messages = []
     while 1:
         try:
-            command = read_message()
+            bundle = read_message()
         except struct.error, e:
             logging.error("Error while reading stdin: \"{}\""
                           " - Exit.".format(e.message))
             sys.exit(1)
-        if not handler.initialized and command['command'] != 'init':
-            queue_messages.append(command)
+        if not handler.initialized and bundle['command'] != 'init':
+            queue_messages.append(bundle)
         else:
-            def parse_and_send_result(c):
-                result = handler.parse(c)
+            def parse_and_send_result(b):
+                result = handler.parse(b)
                 if result is not None:
-                    c['result'] = result
-                    send_message(c)
+                    b['result'] = result
+                    send_message(b)
 
-            parse_and_send_result(command)
+            parse_and_send_result(bundle)
 
             if len(queue_messages) > 0:
-                for c in queue_messages:
-                    parse_and_send_result(c)
+                for bundle in queue_messages:
+                    parse_and_send_result(bundle)
                 queue_messages = []
 
 
