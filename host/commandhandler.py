@@ -36,26 +36,31 @@ class CommandHandler(object):
             return False
 
         id = message['id']
-        check = False
 
-        # check the message only if message['force'] = true
-        if 'force' in message:
-            check = message['force']
-
-        # or content_type of message is 'multipart/signed'
-        if not check:
-            content_type = self.gmail.get_header(id, 'Content-Type')
-            if content_type:
-                check = content_type.find('multipart/signed') >= 0
-
-                # or if message is multipart and it may contain a pgp-signature
-                if not check and content_type.find('multipart/') >= 0:
-                    query = '("BEGIN PGP SIGNATURE" "END PGP SIGNATURE")'
-                    check = self.gmail.message_match(id, query)
-
-        if check:
+        def _verify():
             mail = self.gmail.get(id)
             return self.gpgmail.verify(mail)
+
+        # verify the message only if message['force'] = true
+        if 'force' in message and message['force']:
+            return _verify()
+
+        # or content_type of message is 'multipart/signed'
+        headers = self.gmail.get_headers(id, ['Content-Type', 'Message-ID'])
+        if 'Content-Type' in headers:
+            content_type = headers['Content-Type']
+            if content_type.find('multipart/signed') >= 0:
+                return _verify()
+
+            # or if message is multipart and it may contain a pgp-signature
+            is_multipart = content_type.find('multipart/') >= 0
+            if (is_multipart and 'Message-ID' in headers):
+                rfc822msgid = headers['Message-ID']
+                query = '("BEGIN PGP SIGNATURE" "END PGP SIGNATURE")'
+                match = self.gmail.message_matches(id, query, rfc822msgid)
+                if match:
+                    return _verify()
+        # else
         return None
 
     def sign(self, message):

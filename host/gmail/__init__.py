@@ -63,7 +63,7 @@ class GMail():
             p.start()
             p.join()
             self.logger.debug("end login process")
-            # Retreive the credentials
+            # Retrieve the credentials
             self.credentials = queue.get()
 
         # Access to the GMail APIs
@@ -126,40 +126,52 @@ class GMail():
         message = self.messages.get(userId='me', id=id, format='raw').execute()
         # decode it
         message = base64.urlsafe_b64decode(str(message['raw']))
-        self.loggger.debug('message id {}\n{}'.format(id, message.as_string()))
-        return email.message_from_string(message)
+        self.logger.debug('message id {}\n{}'.format(id, message))
+        message = email.message_from_string(message)
+        return message
 
-    def get_header(self, id, header):
+    def get_headers(self, id, headers=None):
         """
-        Get the specified header of a GMail message id (as known as X-GM-MSGID).
-        Returns None if header not found.
+        Get the headers of a GMail message id (as known as X-GM-MSGID).
+        If headers (list) is given, only include the headers specified.
         """
-        self.logger.info('getting header {} of message {}'.format(header, id))
+
+        self.logger.info('getting the headers {} of message {}'
+                         .format(headers, id))
         message = self.messages.get(userId='me',
                                     id=id,
                                     format='metadata',
-                                    metadataHeaders=header).execute()
-        try:
-            for header_msg in message['payload']['headers']:
-                if header_msg['name'] == header:
-                    self.logger.info('value header {} of message {}: {}'
-                                     .format(header, id, header_msg['value']))
-                    return header_msg['value']
-        except:
-            return None
+                                    metadataHeaders=headers).execute()
+        # build a dict for the headers, pythonic way
+        result = {}
+        for header_msg in message['payload']['headers']:
+            result[header_msg['name']] = header_msg['value']
 
-    def message_match(self, id, query):
+        self.logger.debug('headers of message {}: {}'
+                          .format(id, result))
+        return result
+
+    def message_matches(self, id, query, rfc822msgid=None):
         """
         Check if the GMail message id (as known as X-GM-MSGID) matches
         the query.
+
+        Value rfc822msgid is optional (if None will be automatically requested),
+        and represents the the value of Message-ID in the header of the message.
 
         Query is defined as the same str used in the GMail search box:
         https://support.google.com/mail/answer/7190
         """
         self.logger.info('check if message {} matches query: {}'
                          .format(id, query))
-        # get the real Message-ID
-        rfc822msgid = self.get_header(id, 'Message-ID')
+
+        if rfc822msgid is None:
+            headers = self.get_headers(id, ['Message-ID'])
+            if ['Message-ID'] in headers:
+                rfc822msgid = headers['Message-ID']
+
+        result = False
+
         if rfc822msgid:
             # build the query adding the Message-ID
             q = "rfc822msgid:{} {}".format(rfc822msgid, query)
@@ -167,17 +179,15 @@ class GMail():
                                        includeSpamTrash=True,
                                        q=q,
                                        fields='messages').execute()
-            if 'messages' in found:
-                for m in found['messages']:
-                    if m['id'] == id:
-                        # if the messages here have the same id
-                        # it means they match successful
-                        self.logger.info('message {} matches the query: {}'
-                                         .format(id, query))
-                        return True
-        self.logger.info('message {} does not match the query: {}'
-                         .format(id, query))
-        return False
+            # look for the same message id in found
+            for m in found['messages']:
+                if m['id'] == id:
+                    result = True
+                    break
+
+        self.logger.info('message {} matches the query: {} - [{}]'
+                         .format(id, query, result))
+        return result
 
     @staticmethod
     def _get_receivers(message):
