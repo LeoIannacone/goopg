@@ -170,7 +170,6 @@ class GPGMail(object):
             "Bcc",
             "Cc",
             "Reply-To",
-            "Sender",
             "References",
             "In-Reply-To"
         ]

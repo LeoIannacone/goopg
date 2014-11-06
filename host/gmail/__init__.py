@@ -166,9 +166,9 @@ class GMail():
         return False
 
     @staticmethod
-    def _get_sender_and_receivers(message):
+    def _get_receivers(message):
         """
-        Get the sender and receivers from messaage (email.Message)
+        Get the sender and receivers from message (email.Message)
         Receivers are defined into To, Cc and Bcc message header
         """
         receivers = []
@@ -176,12 +176,11 @@ class GMail():
             if header in message:
                 receivers.append(message[header])
 
-        sender = message['From']
         receivers = ','.join(receivers).split(',')
-        # strip receives
+        # strip receivers
         receivers = [r.strip() for r in receivers]
 
-        return sender, receivers
+        return receivers
 
     @staticmethod
     def _remove_bcc_from_header(message):
@@ -225,18 +224,16 @@ class GMail():
         else:
             msg_str = message.as_string()
 
-        sender, receivers = self._get_sender_and_receivers(message)
+        receivers = self._get_receivers(message)
 
-        if sender is None:
-            raise ValueError("sender is None")
-        if receivers is None:
+        if receivers is None or len(receivers) is 0:
             raise ValueError("receiver is None")
 
         if 'Bcc' in message:
             msg_str = self._remove_bcc_from_header(msg_str)
 
         try:
-            self.smtp.sendmail(sender, receivers, msg_str)
+            self.smtp.sendmail(self.username, receivers, msg_str)
         except SMTPServerDisconnected:
             self._smtp_login()
-            self.smtp.sendmail(sender, receivers, msg_str)
+            self.smtp.sendmail(self.username, receivers, msg_str)

@@ -35,9 +35,8 @@ class gmail_tests(unittest.TestCase):
         my_receivers = ', '.join([to, Cc, Bcc]).split(',')
         # strip receives
         my_receivers = [r.strip() for r in my_receivers]
-        sender, receivers = GMail._get_sender_and_receivers(m)
 
-        self.assertEqual(sender, my_sender)
+        receivers = GMail._get_receivers(m)
         self.assertEqual(receivers, my_receivers)
 
     def test_remove_bcc_from_header(self):
