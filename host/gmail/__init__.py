@@ -95,11 +95,11 @@ class GMail():
 
     def _smtp_login(self):
         """
-        Loging in GMail smtp
+        Login in GMail smtp
         """
         self._refresh_credentials()
 
-        # intialize SMTP procedure
+        # initialize SMTP procedure
         self.smtp = SMTP('smtp.gmail.com', 587)
 
         if self.logger.getEffectiveLevel() == logging.DEBUG:
@@ -216,7 +216,7 @@ class GMail():
         if not isinstance(message, (str, unicode)):
             message = message.as_string()
 
-        # slipt the message in header and body
+        # split the message in header and body
         header, body = message.split('\n\n', 1)
 
         # check for Bcc in headers and remove it
@@ -238,10 +238,6 @@ class GMail():
         return '\n\n'.join([header, body])
 
     def send(self, id, message, delete_draft=True):
-        # APIs do not work
-        # raw = base64.urlsafe_b64encode(message.as_string())
-        # body = {'raw': raw}
-        # self.messages.send(userId='me', body=body).execute()
 
         if isinstance(message, (str, unicode)):
             msg_str = message
@@ -256,6 +252,10 @@ class GMail():
 
         if 'Bcc' in message:
             msg_str = self._remove_bcc_from_header(msg_str)
+
+        # APIs do not work
+        # raw = base64.urlsafe_b64encode(msg_str)
+        # self.messages.send(userId='me', body={'raw': raw}).execute()
 
         try:
             self.smtp.sendmail(self.username, receivers, msg_str)
