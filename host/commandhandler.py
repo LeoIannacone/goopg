@@ -42,15 +42,16 @@ class CommandHandler(object):
         if 'force' in message:
             check = message['force']
 
-        # or content_type of message contains 'multipart/signed'
+        # or content_type of message is 'multipart/signed'
         if not check:
             content_type = self.gmail.get_header(id, 'Content-Type')
-            check = content_type.find('multipart/signed') >= 0
+            if content_type:
+                check = content_type.find('multipart/signed') >= 0
 
-        # or if message is multipart and it may contain a pgp-signature
-        if not check and content_type.find('multipart/') >= 0:
-            query = '(BEGIN-PGP-SIGNATURE and END-PGP-SIGNATURE)'
-            check = self.gmail.message_match(id, query)
+                # or if message is multipart and it may contain a pgp-signature
+                if not check and content_type.find('multipart/') >= 0:
+                    query = '(BEGIN-PGP-SIGNATURE and END-PGP-SIGNATURE)'
+                    check = self.gmail.message_match(id, query)
 
         if check:
             mail = self.gmail.get(id)
