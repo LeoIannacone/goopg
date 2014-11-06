@@ -36,6 +36,7 @@ class GMail():
         # the main username
         self.username = username
         self.http = httplib2.Http()
+        self.logger = logging.getLogger('GMail')
 
         # Start the OAuth flow to retrieve credentials
         flow = flow_from_clientsecrets(CLIENT_SECRET_FILE,
@@ -51,16 +52,17 @@ class GMail():
             # call a subprocess as workaround for stdin/stdout
             # blocked by the main process, this is the main function:
             def _subprocess_login():
-                logger = logging.getLogger('GMailLogin')
-                sys.stdout = StreamToLogger(logger, logging.INFO)
-                sys.stderr = StreamToLogger(logger, logging.ERROR)
+                sys.stdout = StreamToLogger(self.logger, logging.DEBUG)
+                sys.stderr = StreamToLogger(self.logger, logging.ERROR)
                 queue.put(run(flow, storage, http=self.http))
 
             # A Queue to get the result from subprocess
             queue = Queue()
             p = Process(target=_subprocess_login)
+            self.logger.debug("start login process")
             p.start()
             p.join()
+            self.logger.debug("end login process")
             # Retreive the credentials
             self.credentials = queue.get()
 
@@ -88,6 +90,7 @@ class GMail():
     def _refresh_credentials(self):
         """Refresh credentials if needed"""
         if self.credentials.access_token_expired:
+            self.logger.info("credentials expired - refreshing")
             self.credentials.refresh(self.http)
 
     def _smtp_login(self):
@@ -99,7 +102,8 @@ class GMail():
         # intialize SMTP procedure
         self.smtp = SMTP('smtp.gmail.com', 587)
 
-        #self.smtp.set_debuglevel(True)
+        if self.logger.getEffectiveLevel() == logging.DEBUG:
+            self.smtp.set_debuglevel(True)
         self.smtp.starttls()
         self.smtp.ehlo()
 
@@ -117,10 +121,12 @@ class GMail():
         """
         Get a Message from the GMail message id (as known as X-GM-MSGID)
         """
+        self.logger.info('getting message {}'.format(id))
         # this return a message.raw in url safe base64
         message = self.messages.get(userId='me', id=id, format='raw').execute()
         # decode it
         message = base64.urlsafe_b64decode(str(message['raw']))
+        self.loggger.debug('message id {}\n{}'.format(id, message.as_string()))
         return email.message_from_string(message)
 
     def get_header(self, id, header):
@@ -128,14 +134,16 @@ class GMail():
         Get the specified header of a GMail message id (as known as X-GM-MSGID).
         Returns None if header not found.
         """
+        self.logger.info('getting header {} of message {}'.format(header, id))
         message = self.messages.get(userId='me',
                                     id=id,
                                     format='metadata',
                                     metadataHeaders=header).execute()
-
         try:
             for header_msg in message['payload']['headers']:
                 if header_msg['name'] == header:
+                    self.logger.info('value header {} of message {}: {}'
+                                     .format(header, id, header_msg['value']))
                     return header_msg['value']
         except:
             return None
@@ -148,6 +156,8 @@ class GMail():
         Query is defined as the same str used in the GMail search box:
         https://support.google.com/mail/answer/7190
         """
+        self.logger.info('check if message {} matches query: {}'
+                         .format(id, query))
         # get the real Message-ID
         rfc822msgid = self.get_header(id, 'Message-ID')
         if rfc822msgid:
@@ -162,7 +172,11 @@ class GMail():
                     if m['id'] == id:
                         # if the messages here have the same id
                         # it means they match successful
+                        self.logger.info('message {} matches the query: {}'
+                                         .format(id, query))
                         return True
+        self.logger.info('message {} does not match the query: {}'
+                         .format(id, query))
         return False
 
     @staticmethod
@@ -235,5 +249,6 @@ class GMail():
         try:
             self.smtp.sendmail(self.username, receivers, msg_str)
         except SMTPServerDisconnected:
+            self.logger.info('smtp disconnected - reconnecting')
             self._smtp_login()
             self.smtp.sendmail(self.username, receivers, msg_str)
