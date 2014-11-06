@@ -50,7 +50,7 @@ class CommandHandler(object):
 
                 # or if message is multipart and it may contain a pgp-signature
                 if not check and content_type.find('multipart/') >= 0:
-                    query = '(BEGIN-PGP-SIGNATURE and END-PGP-SIGNATURE)'
+                    query = '("BEGIN PGP SIGNATURE" "END PGP SIGNATURE")'
                     check = self.gmail.message_match(id, query)
 
         if check:
