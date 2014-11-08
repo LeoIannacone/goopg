@@ -4,11 +4,11 @@ function get_py_port() {
     window.console.log("Connecting to py script ...");
     var py_port = window.chrome.runtime.connectNative("com.leoiannacone.goopg");
 
-    py_port.onMessage.addListener(function (msg) {
-        // workaround for msg utf-8 coming from py
-        window.console.log("Received ", msg);
+    py_port.onMessage.addListener(function (bundle) {
+        // workaround for bundle utf-8 coming from py
+        window.console.log("Received ", bundle);
         if (web_port !== null)
-            web_port.postMessage(msg);
+            web_port.postMessage(bundle);
         else
             window.console.log("web port is null");
     });
@@ -25,13 +25,13 @@ var py_port = null;
 
 window.chrome.runtime.onConnectExternal.addListener(function (my_web_port) {
     web_port = my_web_port;
-    web_port.onMessage.addListener(function (request) {
-        window.console.log("Sending", request);
+    web_port.onMessage.addListener(function (bundle) {
+        window.console.log("Sending", bundle);
         try {
-            py_port.postMessage(request);
+            py_port.postMessage(bundle);
         } catch (err) {
             py_port = get_py_port();
-            py_port.postMessage(request);
+            py_port.postMessage(bundle);
         }
     });
 });

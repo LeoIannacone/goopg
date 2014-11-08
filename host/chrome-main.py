@@ -11,26 +11,26 @@ from util import StreamToLogger
 from commandhandler import CommandHandler
 
 
-def send_message(message):
-    """Helper function that sends a message to the webapp."""
-    # Get a json string from the message
-    message = json.dumps(message)
-    # Write message size.
-    sys.stdout.write(struct.pack('I', len(message)))
-    # Write the message itself.
-    sys.stdout.write(message)
+def send_bundle(bundle):
+    """Helper function that sends a bundle to the webapp."""
+    # Get a json string from the bundle
+    bundle = json.dumps(bundle)
+    # Write bundle size.
+    sys.stdout.write(struct.pack('I', len(bundle)))
+    # Write the bundle itself.
+    sys.stdout.write(bundle)
     sys.stdout.flush()
 
 
-def read_message():
-    """Helper that reads messages from the webapp."""
-    # Read the message length (first 4 bytes).
+def read_bundle():
+    """Helper that reads bundles from the webapp."""
+    # Read the bundle length (first 4 bytes).
     text_length_bytes = sys.stdin.read(4)
 
-    # Unpack message length as 4 byte integer.
+    # Unpack bundle length as 4 byte integer.
     text_length = struct.unpack('i', text_length_bytes)[0]
 
-    # Read the text (JSON object) of the message.
+    # Read the text (JSON object) of the bundle.
     raw_text = sys.stdin.read(text_length).decode('utf-8')
     return json.loads(raw_text)
 
@@ -47,32 +47,32 @@ def main():
     handler = CommandHandler()
 
     # send init request
-    send_message({"command": "request_init"})
+    send_bundle({"command": "request_init"})
 
-    # a queue to store messages received before the 'init' bundle
-    queue_messages = []
+    # a queue to store bundles received before the 'init' command
+    queue = []
     while 1:
         try:
-            bundle = read_message()
+            bundle = read_bundle()
         except struct.error, e:
             logging.error("Error while reading stdin: \"{}\""
                           " - Exit.".format(e.message))
             sys.exit(1)
         if not handler.initialized and bundle['command'] != 'init':
-            queue_messages.append(bundle)
+            queue.append(bundle)
         else:
             def parse_and_send_result(b):
                 result = handler.parse(b)
                 if result is not None:
                     b['result'] = result
-                    send_message(b)
+                    send_bundle(b)
 
             parse_and_send_result(bundle)
 
-            if len(queue_messages) > 0:
-                for bundle in queue_messages:
+            if len(queue) > 0:
+                for bundle in queue:
                     parse_and_send_result(bundle)
-                queue_messages = []
+                queue = []
 
 
 if __name__ == '__main__':

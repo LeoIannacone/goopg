@@ -109,44 +109,44 @@ var Port = {
         return port;
     },
 
-    // send a msg
-    send: function (msg) {
+    // send a bundle
+    send: function (bundle) {
         try {
-            web_port.postMessage(msg);
+            web_port.postMessage(bundle);
         } catch (err) {
             web_port = Port.get();
-            web_port.postMessage(msg);
+            web_port.postMessage(bundle);
         }
     },
 
     // the handler
-    handler: function (msg) {
+    handler: function (bundle) {
         // handle the message received
-        if (msg.command == 'request_init') {
+        if (bundle.command == 'request_init') {
             var init_command = {};
             init_command.command = 'init';
             init_command.options = {};
             init_command.options.username = USERNAME;
             Port.send(init_command);
-        } else if (msg.command == "verify") {
-            if (msg.result.status === null)
+        } else if (bundle.command == "verify") {
+            if (bundle.result.status === null)
                 return;
-            var signedmessage = new SignedMessage(msg.id);
+            var signedmessage = new SignedMessage(bundle.id);
             if (signedmessage.exists()) {
-                signedmessage.hide_signature(msg.result.filename);
-                signedmessage.add_banner(msg.result);
+                signedmessage.hide_signature(bundle.result.filename);
+                signedmessage.add_banner(bundle.result);
             }
-        } else if (msg.command == "sign") {
-            if (msg.result === false) {
+        } else if (bundle.command == "sign") {
+            if (bundle.result === false) {
                 Alert.set("Your message was not sent. Please retry.");
-                var button = document.getElementById(msg.button_id);
+                var button = document.getElementById(bundle.button_id);
                 if (button) {
                     button.addEventListener('click', SignSendButton.on_click);
                     button.style.color = "";
                     button.innerHTML = "Sign and Send";
                 }
-            } else if (msg.result === true)
-                SignSendButton.hide_compositor(msg.button_id);
+            } else if (bundle.result === true)
+                SignSendButton.hide_compositor(bundle.button_id);
         }
     }
 };
