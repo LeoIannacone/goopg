@@ -21,33 +21,20 @@
 
 * Spread screenshots about GMail is going to get new extension
 
-
-# Deps #
-
-```bash
-sudo apt-get install node-less python-googleapi python-gflags python-xdg python-gnupg
+# Installation:
+The installation consists in two phases:
+ * Install the chrome/ium extension to [this link](https://chrome.google.com/webstore/detail/goopg/ifpoaednafmgolabhpjmbimllaoidelg)
+ * Install the needed packages:
 ```
-
-# Build the css #
-```bash
-cd app/lib
-make
-cd -
+ sudo add-apt-repository ppa:team-goopg/goopg
+ sudo apt-get update
+ sudo apt-get install goopg-chromium
 ```
-
-# Install the extension in Chrome/Chromium #
-* Open [chrome://extensions](chrome://extensions) in the browser
-* Click on "Developer mode"
-* Then click on "Load unpackage extension" and select the dir `app`
-
-# Update the app ID and install the host #
-Once extension is installed, get the `NEW_ID` extension in chrome://extension and run the following commmands:
-```bash
-cd templates
-NEW_ID=the_id_you_found
-BROWSER=your_browser # (chrome or chromium)
-bash build.sh $NEW_ID $BROWSER
-cd -
-```
+ Replace `goopg-chromium` with `goopg-chrome` if you use Chrome.
 
 Open http://gmail.com
+
+
+# If you want help in develop
+
+If you would like to help in developing, see the [dev-install](docs/dev-install.md) and the [project documentationn](docs/project.md).
