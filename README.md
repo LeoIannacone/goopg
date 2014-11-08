@@ -35,32 +35,18 @@ make
 cd -
 ```
 
-# Install in Chrome #
+# Install the extension in Chrome/Chromium #
 * Open [chrome://extensions](chrome://extensions) in the browser
 * Click on "Developer mode"
 * Then click on "Load unpackage extension" and select the dir `app`
 
-# Update the app ID #
-Once extension is installed, get the `NEW_ID` extension in chrome://extension and run:
+# Update the app ID and install the host #
+Once extension is installed, get the `NEW_ID` extension in chrome://extension and run the following commmands:
 ```bash
+cd templates
 NEW_ID=the_id_you_found
-OLD_ID=ppopiamobkilibbniemlecehjmbfbjjp
-sed s/$OLD_ID/$NEW_ID/ -i app/goopg-web-extension-id.js host/com.leoiannacone.goopg.json
-```
-
-# Install the host
-
-If you use chromium:
-```bash
-cd host
-bash install.sh
-cd -
-```
-
-If you use chrome:
-```bash
-cd host
-bash install.sh google-chrome
+BROWSER=your_browser # (chrome or chromium)
+bash build.sh $NEW_ID $BROWSER
 cd -
 ```
 

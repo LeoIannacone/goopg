@@ -1,9 +1,9 @@
 {
     "name": "com.leoiannacone.goopg",
     "description": "GPG wrapper",
-    "path": "HOST_PATH",
+    "path": "@HOST_PATH@",
     "type": "stdio",
     "allowed_origins": [
-        "chrome-extension://ppopiamobkilibbniemlecehjmbfbjjp/"
+        "chrome-extension://@EXT_ID@/"
     ]
 }

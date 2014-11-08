@@ -4,4 +4,4 @@
 // out of the main file, so people can git-pull without
 // having conflicts with their own EXTENSION_ID
 
-var GOOPG_EXTENSION_ID = "ppopiamobkilibbniemlecehjmbfbjjp";
+var GOOPG_EXTENSION_ID = "@EXT_ID@";

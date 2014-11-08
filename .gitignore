@@ -1,3 +1,4 @@
 *.pyc
+app/goopg-web-extension-id.js
 app/lib/css/goopg-bootstrap.css
 app/lib/fonts/
