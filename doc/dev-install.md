@@ -21,7 +21,7 @@ cd -
 * Then click on "Load unpackaged extension" and select the dir `app`
 
 
-### Update the app ID and install the host #
+### Update the app ID and install the host
 Once extension is installed, get the `NEW_ID` extension in chrome://extension and run the following commands:
 ```bash
 cd templates
@@ -30,5 +30,10 @@ BROWSER=your_browser # (chrome or chromium)
 bash build.sh $NEW_ID $BROWSER
 cd -
 ```
-
 Reload http://gmail.com
+
+
+
+# About logging
+
+For log information, see the ```~/.cache/goopg/log file```
