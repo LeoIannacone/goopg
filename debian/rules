@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@
+
+HOST_PATH := /usr/share/goopg/chrome-main.py
+EXT_ID := ifpoaednafmgolabhpjmbimllaoidelg
+TEMPLATE := templates/com.leoiannacone.goopg.json.in
+OUT := debian/com.leoiannacone.goopg.json
+
+override_dh_auto_build:
+	sed -e "s|@HOST_PATH@|$(HOST_PATH)|" -e "s|@EXT_ID@|$(EXT_ID)|" $(TEMPLATE) > $(OUT)
+
+override_dh_auto_clean:
+	make -C app/lib/ clean
+	rm -f $(OUT) app/goopg-web-extension-id.js `find -name *.pyc`
