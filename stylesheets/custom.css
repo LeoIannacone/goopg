@@ -1,0 +1,51 @@
+#downloads {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+*, body, pre, header h1, h1, h2, h3, footer {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 300;
+}
+
+h1, h2, h3 {
+    color: #4d4d4d;
+    text-shadow: none;
+}
+
+strong, b, #view-on-github {
+    font-weight: 700;
+}
+
+pre, code {
+    font-family: "Ubuntu Mono";
+}
+
+pre {
+    border-radius: 3px;
+    border: 1px solid white;
+    box-shadow: 0 1px 1px black inset;
+    padding: 10px 15px;
+}
+
+code {
+    padding: 4px 6px 3px;
+    border-radius: 3px;
+}
+
+p img {
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+a {
+    color: #ff4200;
+    border-bottom: 1px dotted #AAA;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #F3193D;
+    border-bottom: 1px dotted #888;
+}
