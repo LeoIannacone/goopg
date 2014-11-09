@@ -1,5 +1,8 @@
 # Installation for developers
 
+### Remove other installations
+If you installed the Goopg plugins and extensions, please remove them before continue.
+
 ### Deps
 Install these dependencies:
 ```bash
