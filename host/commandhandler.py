@@ -38,7 +38,7 @@ class CommandHandler(object):
         id = bundle['id']
 
         def _verify():
-            mail = self.gmail.get(id)
+            mail, threadId = self.gmail.get(id)
             return self.gpgmail.verify(mail)
 
         # verify the message only if bundle['force'] = true
@@ -68,10 +68,10 @@ class CommandHandler(object):
             return False
         result = False
         try:
-            draft = self.gmail.get(bundle["id"])
+            draft, threadId = self.gmail.get(bundle["id"])
             new_message = self.gpgmail.sign(draft)
             if new_message:
-                self.gmail.send(bundle["id"], new_message)
+                self.gmail.send(new_message, threadId)
                 result = True
         except Exception, e:
             self.logger.exception(e)

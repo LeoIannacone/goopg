@@ -174,9 +174,7 @@ The native application is placed in host directory and it is written in python.
 
   - message_matches(id, query): check if message matches the given query
 
-  - send(id, message): sends a message. For now it uses a SMTP connection.
-                       GMail APIs no work properly with signed messages as
-                       defined in RFC 3156, therefore the `id` is not used.
+  - send(id, message): sends a message.
  ```
  * `gmail/client_secret.json`: contains the identification of Goopg, required during the login process
 

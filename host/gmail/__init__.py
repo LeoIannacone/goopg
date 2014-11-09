@@ -10,7 +10,6 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
 
-from smtplib import SMTP, SMTPServerDisconnected
 from multiprocessing import Process, Queue
 
 from xdg import BaseDirectory
@@ -69,10 +68,6 @@ class GMail():
         # Access to the GMail APIs
         self._gmail_API_login()
 
-        # Use smtp as workaround to send message, GMail API
-        # bugged with Content-Type: multipart/signed
-        self._smtp_login()
-
     def _gmail_API_login(self):
         """
         Login in GMail APIs
@@ -93,42 +88,27 @@ class GMail():
             self.logger.info("credentials expired - refreshing")
             self.credentials.refresh(self.http)
 
-    def _smtp_login(self):
-        """
-        Login in GMail smtp
-        """
-        self._refresh_credentials()
-
-        # initialize SMTP procedure
-        self.smtp = SMTP('smtp.gmail.com', 587)
-
-        if self.logger.getEffectiveLevel() == logging.DEBUG:
-            self.smtp.set_debuglevel(True)
-        self.smtp.starttls()
-        self.smtp.ehlo()
-
-        # XOATH2 authentication
-        smtp_auth_string = 'user={}\1auth=Bearer {}\1\1'
-        access_token = self.credentials.access_token
-        smtp_auth_string = smtp_auth_string.format(self.username,
-                                                   access_token)
-        smpt_auth_b64 = base64.b64encode(smtp_auth_string)
-        # smtp login
-        self.smtp.docmd("AUTH", "XOAUTH2 {}".format(smpt_auth_b64))
-        self.smtp.send("\r\n")
-
     def get(self, id):
         """
-        Get a Message from the GMail message id (as known as X-GM-MSGID)
+        Get a Message from the GMail message id (as known as X-GM-MSGID).
+
+        Returns the message (Message) and the threadId (as known as X-GM-THRID)
+        it belongs to.
         """
         self.logger.info('getting message {}'.format(id))
-        # this return a message.raw in url safe base64
-        message = self.messages.get(userId='me', id=id, format='raw').execute()
+        # this return the message with a raw field in url safe base64
+        gm_message = self.messages.get(userId='me',
+                                       id=id,
+                                       format='raw').execute()
         # decode it
-        message = base64.urlsafe_b64decode(str(message['raw']))
+        message = base64.urlsafe_b64decode(str(gm_message['raw']))
+        # get the threadId it belongs to
+        threadId = gm_message['threadId']
+
         self.logger.debug('message id {}\n{}'.format(id, message))
+
         message = email.message_from_string(message)
-        return message
+        return message, threadId
 
     def get_headers(self, id, headers=None):
         """
@@ -190,76 +170,20 @@ class GMail():
                          .format(id, query, result))
         return result
 
-    @staticmethod
-    def _get_receivers(message):
+    def send(self, message, threadId=None):
         """
-        Get the sender and receivers from message (email.Message)
-        Receivers are defined into To, Cc and Bcc message header
-        """
-        receivers = []
-        for header in ['To', 'Cc', 'Bcc']:
-            if header in message:
-                receivers.append(message[header])
+        Send a message (str or Message).
 
-        receivers = ','.join(receivers).split(',')
-        # strip receivers
-        receivers = [r.strip() for r in receivers]
-
-        return receivers
-
-    @staticmethod
-    def _remove_bcc_from_header(message):
-        """
-        Return a new message (str) without the Bcc field
+        If message is In-Reply-To, the threadId (as known as X-GM-THRID)
+        must be passed. It can be get via the get() function.
         """
 
         if not isinstance(message, (str, unicode)):
             message = message.as_string()
 
-        # split the message in header and body
-        header, body = message.split('\n\n', 1)
+        body = {'raw': base64.urlsafe_b64encode(message)}
 
-        # check for Bcc in headers and remove it
-        headers = header.split('\n')
-        for i in range(0, len(headers)):
-            line = headers[i]
-            if line.find('Bcc:') == 0:
-                headers.pop(i)
-                # check if next lines start with ' ', which means
-                # Bcc field is continuing, and remove them
-                i += 1
-                max_length = len(headers)
-                while(i < max_length and headers[i].find(' ') == 0):
-                    headers.pop(i)
-                break
-        header = '\n'.join(headers)
+        if threadId is not None:
+            body['threadId'] = threadId
 
-        # return the new message
-        return '\n\n'.join([header, body])
-
-    def send(self, id, message, delete_draft=True):
-
-        if isinstance(message, (str, unicode)):
-            msg_str = message
-            message = email.message_from_string(message)
-        else:
-            msg_str = message.as_string()
-
-        receivers = self._get_receivers(message)
-
-        if receivers is None or len(receivers) is 0:
-            raise ValueError("receiver is None")
-
-        if 'Bcc' in message:
-            msg_str = self._remove_bcc_from_header(msg_str)
-
-        # APIs do not work
-        # raw = base64.urlsafe_b64encode(msg_str)
-        # self.messages.send(userId='me', body={'raw': raw}).execute()
-
-        try:
-            self.smtp.sendmail(self.username, receivers, msg_str)
-        except SMTPServerDisconnected:
-            self.logger.info('smtp disconnected - reconnecting')
-            self._smtp_login()
-            self.smtp.sendmail(self.username, receivers, msg_str)
+        self.messages.send(userId='me', body=body).execute()
