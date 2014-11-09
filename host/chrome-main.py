@@ -46,9 +46,6 @@ def main():
     sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
     handler = CommandHandler()
 
-    # send init request
-    send_bundle({"command": "request_init"})
-
     # a queue to store bundles received before the 'init' command
     queue = []
     while 1:
@@ -59,6 +56,8 @@ def main():
                           " - Exit.".format(e.message))
             sys.exit(1)
         if not handler.initialized and bundle['command'] != 'init':
+            # send init request
+            send_bundle({"command": "request_init"})
             queue.append(bundle)
         else:
             def parse_and_send_result(b):
