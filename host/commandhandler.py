@@ -1,5 +1,5 @@
 from gpgmail import GPGMail
-from gmail import GMail
+from gmail import Gmail
 
 import logging
 
@@ -27,7 +27,7 @@ class CommandHandler(object):
         if not 'options' in bundle and not 'username' in bundle['options']:
             return False
         self.gpgmail = GPGMail()
-        self.gmail = GMail(bundle['options']['username'])
+        self.gmail = Gmail(bundle['options']['username'])
         self.initialized = True
         return True
 

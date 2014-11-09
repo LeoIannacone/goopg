@@ -2,18 +2,18 @@
 
 # Requirements
 
-Without using external tools, such as Email Clients, GMail users must be able to:
+Without using external tools, such as Email Clients, Gmail users must be able to:
 
  * to encrypt and decrypt files and emails
  * sign and verify emails (both in-line and attached as described in RFC 3156)
 
-The UI must be the GMail web interface, providing users with the Google User Experience.
+The UI must be the Gmail web interface, providing users with the Google User Experience.
 
 ## Requirements analysis
 
-GMail web interface is not able to handle with GPG nowadays. Some other projects had tried to fix it during last years, bundling PGP algorithms in JavaScript code and heavy modifying the GMail interface.
+Gmail web interface is not able to handle with GPG nowadays. Some other projects had tried to fix it during last years, bundling PGP algorithms in JavaScript code and heavy modifying the Gmail interface.
 
-This kind of approach seems to have failed, since GMail can suddenly change its own HTML structure, therefore making those applications useless.
+This kind of approach seems to have failed, since Gmail can suddenly change its own HTML structure, therefore making those applications useless.
 
 A new way to look for a solution is empowering external tools which are designed to easy and quickly do PGP transformations and verifications.
 
@@ -37,7 +37,7 @@ show result  <---  gateway (adapt to web if needed)  <---  send result
 
 ## Risks analysis
 
- * GMail web interface might change HTML someday. As less as possible HTML modifications and interactions could prevent future work.
+ * Gmail web interface might change HTML someday. As less as possible HTML modifications and interactions could prevent future work.
 
  * Even if surfing the web it is enough easy to find documentation about PGP, it seems there is a lack of tool/API and example showing how emails are verified/signed/encrypted/decrypted through PGP. Understanding deeply how it works, as well as how to get and send emails, can heavy delay the development.
 
@@ -50,8 +50,8 @@ The web interface provides a simple way to retrieve the original email content, 
 https://mail.google.com/mail/u/0/?ui=2&ik=%(auth_token)s&view=om&th=%(gmail_message_id)s
 ```
 With:
- * `auto_token` - bundled in the GMail HTML (variable GLOBALS at index 9)
- * `gmail_message_id``` - the GMail internal message ID (known as ```X-GM-MSGID`), bundled as ClassName of messages in the HTML (starting with 'm')
+ * `auto_token` - bundled in the Gmail HTML (variable GLOBALS at index 9)
+ * `gmail_message_id``` - the Gmail internal message ID (known as ```X-GM-MSGID`), bundled as ClassName of messages in the HTML (starting with 'm')
 
 Hence, get the `X-GM-MSGID` is simple as get the the div.ClassName.
 
@@ -63,14 +63,14 @@ Each PGP operation will be implemented outside the web context, in other words, 
 
 ## Sending messages
 
-Analyzing the HTML comes out that there is no (simple) way to (given a string) send a message via GMail web interface. Understanding how to do that could fit into the first risk analyzed.
+Analyzing the HTML comes out that there is no (simple) way to (given a string) send a message via Gmail web interface. Understanding how to do that could fit into the first risk analyzed.
 
 Sending the message will be done in the native application, which instead could fit in the second risk, but remains the preferred choice.
 
 
 # Project analysis and development
 
-GMail HTML structure is compiled (or something like that), making hard to understand the HTML elements IDs and ClassNames. This makes stronger the first point described in Risk analysis.
+Gmail HTML structure is compiled (or something like that), making hard to understand the HTML elements IDs and ClassNames. This makes stronger the first point described in Risk analysis.
 
 The logical operations must be moved outside the web context as mush as possible.
 
@@ -96,7 +96,7 @@ bundle
 
  * `lib/*`: contains the css and fonts used in web (it uses [bootstrap](http://getbootstrap.com/))
 
- * `inject.js`: injects javascripts (goopg-web*.js) files in GMail web page
+ * `inject.js`: injects javascripts (goopg-web*.js) files in Gmail web page
 
  * `goopg.js`: is the background script which takes the bundles from the web pages and forwards them to then native Host, and viceversa. It is the Gateway we talked about before and it will be described below.
 
@@ -105,7 +105,7 @@ bundle
  * `goopg-web.js`: the main javascript
  ```
   // main functions
-  look_for_compositors(): on HTML change, looks for GMail compositors and
+  look_for_compositors(): on HTML change, looks for Gmail compositors and
                           adds a 'Sign and Send' button
   look_for_signedmessages: on HTML change, looks for messages and sends
                            a `verify` command
@@ -114,7 +114,7 @@ bundle
   Utils: contain some utils
   Alert: is the banner added to the verified messages
   Port: is the port communication to send and receive bundles
-  SingedMessage: represents a GMail signed message in the current view of the web page
+  SingedMessage: represents a Gmail signed message in the current view of the web page
   SingSendButton: represent a 'Sing and Send' button of the compositors
  ```
 
@@ -162,11 +162,11 @@ The native application is placed in host directory and it is written in python.
 
  * `chrome-main.py```: it is the main script executed by the browser. It reads from stdin the `bundle` sent by the gateway and writes to stdout a new `bundle` as the result of the operation. It calls CommandHandler to consume the ```bundle`.
 
- * `commandhandler.py`: contains a class which takes care to parse the `bundle` and generates the result to send back. It calls GPGMail and GMail classes to operate with messages. In the future in may call a ConfigurationParses to properly initalize the rest of the script
+ * `commandhandler.py`: contains a class which takes care to parse the `bundle` and generates the result to send back. It calls GPGMail and Gmail classes to operate with messages. In the future in may call a ConfigurationParses to properly initalize the rest of the script
 
  * `gpgmail.py`: contains the main functions to verify and sign a email message, it uses [gnupg.GPG](https://pythonhosted.org/python-gnupg/)
 
- * `gmail/__init__.py`: this is the file which contains the [GMail API](https://developers.google.com/gmail/api) calls. The code is super documented, for more info take a look inside.
+ * `gmail/__init__.py`: this is the file which contains the [Gmail API](https://developers.google.com/gmail/api) calls. The code is super documented, for more info take a look inside.
  ```
   - get(id): get a the message by id
 

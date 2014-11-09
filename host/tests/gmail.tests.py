@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 current = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.append(current)
 
-from gmail import GMail
+from gmail import Gmail
 
 
 class gmail_tests(unittest.TestCase):

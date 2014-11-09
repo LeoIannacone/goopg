@@ -29,13 +29,13 @@ CLIENT_SECRET_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 STORAGE_DIR = BaseDirectory.save_cache_path(os.path.join('goopg', 'storage'))
 
 
-class GMail():
+class Gmail():
 
     def __init__(self, username):
         # the main username
         self.username = username
         self.http = httplib2.Http()
-        self.logger = logging.getLogger('GMail')
+        self.logger = logging.getLogger('Gmail')
 
         # Start the OAuth flow to retrieve credentials
         flow = flow_from_clientsecrets(CLIENT_SECRET_FILE,
@@ -65,12 +65,12 @@ class GMail():
             # Retrieve the credentials
             self.credentials = queue.get()
 
-        # Access to the GMail APIs
+        # Access to the Gmail APIs
         self._gmail_API_login()
 
     def _gmail_API_login(self):
         """
-        Login in GMail APIs
+        Login in Gmail APIs
         """
         self._refresh_credentials()
 
@@ -90,7 +90,7 @@ class GMail():
 
     def get(self, id):
         """
-        Get a Message from the GMail message id (as known as X-GM-MSGID).
+        Get a Message from the Gmail message id (as known as X-GM-MSGID).
 
         Returns the message (Message) and the threadId (as known as X-GM-THRID)
         it belongs to.
@@ -112,7 +112,7 @@ class GMail():
 
     def get_headers(self, id, headers=None):
         """
-        Get the headers of a GMail message id (as known as X-GM-MSGID).
+        Get the headers of a Gmail message id (as known as X-GM-MSGID).
         If headers (list) is given, only include the headers specified.
         """
 
@@ -133,13 +133,13 @@ class GMail():
 
     def message_matches(self, id, query, rfc822msgid=None):
         """
-        Check if the GMail message id (as known as X-GM-MSGID) matches
+        Check if the Gmail message id (as known as X-GM-MSGID) matches
         the query.
 
         Value rfc822msgid is optional (if None will be automatically requested),
         and represents the the value of Message-ID in the header of the message.
 
-        Query is defined as the same str used in the GMail search box:
+        Query is defined as the same str used in the Gmail search box:
         https://support.google.com/mail/answer/7190
         """
         self.logger.info('check if message {} matches query: {}'
