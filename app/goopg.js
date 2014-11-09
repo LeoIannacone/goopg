@@ -14,7 +14,12 @@ function get_py_port() {
     });
 
     py_port.onDisconnect.addListener(function () {
-        window.console.log("Failed to connect: " + window.chrome.runtime.lastError.message);
+        var error = window.chrome.runtime.lastError.message;
+        window.console.log("Failed to connect: " + error);
+        if (web_port !== null)
+            web_port.postMessage({
+                'port_error': error
+            });
     });
 
     return py_port;

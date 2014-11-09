@@ -25,6 +25,9 @@ var GOOGLE_CLASS_MESSAGE_SAVED = 'aOy';
 // port to communicate with background
 var web_port = null;
 
+// if cannot comunicate with the py port
+var native_available = true;
+
 
 var Utils = {
 
@@ -142,7 +145,9 @@ var Port = {
                 signedmessage.add_banner(bundle.result);
             }
         } else if (bundle.command == "sign") {
-            if (bundle.result === false) {
+            if (bundle.result === true) {
+                SignSendButton.hide_compositor(bundle.button_id);
+            } else if (bundle.result === false) {
                 Alert.set("Your message was not sent. Please retry.");
                 var button = document.getElementById(bundle.button_id);
                 if (button) {
@@ -150,8 +155,16 @@ var Port = {
                     button.style.color = "";
                     button.innerHTML = "Sign and Send";
                 }
-            } else if (bundle.result === true)
-                SignSendButton.hide_compositor(bundle.button_id);
+            }
+        } else if (bundle.port_error) {
+            var message = bundle.port_error;
+            if (message == 'Access to the specified native messaging host is forbidden.') {
+                native_available = false;
+                setTimeout(function () {
+                    var installation = 'Please see the <a href="http://leoiannacone.github.io/goopg/">installation</a> instructions.';
+                    Alert.set('Goopg cannot communicate with the plugin. ' + installation);
+                }, 5000);
+            }
         }
     }
 };
@@ -391,6 +404,8 @@ var SignSendButton = {
 
 
 function look_for_signedmessages() {
+    if (native_available === false)
+        return;
     var messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
     for (var i = 0; i < messages.length; i++) {
         var id = null;
@@ -418,6 +433,8 @@ function look_for_signedmessages() {
 }
 
 function look_for_compositors() {
+    if (native_available === false)
+        return;
     var sendButtons = document.getElementsByClassName(GOOGLE_CLASS_SENDBUTTON);
     // append the sign&send button
     for (var i = 0; i < sendButtons.length; i++) {
