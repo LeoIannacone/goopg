@@ -50,6 +50,10 @@ a:hover {
     border-bottom: 1px dotted #888;
 }
 
+a#view-on-github:hover {
+    color: #303030;
+}
+
 #donation {
     border: 1px solid #f0f0f0;
     text-align: center;
