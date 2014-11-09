@@ -52,6 +52,14 @@ var Utils = {
         return str.replace(/(?:^|\s)\S/g, function (a) {
             return a.toUpperCase();
         });
+    },
+
+    get_init_bundle: function () {
+        var bundle = {};
+        bundle.command = 'init';
+        bundle.options = {};
+        bundle.options.username = USERNAME;
+        return bundle;
     }
 };
 
@@ -123,11 +131,8 @@ var Port = {
     handler: function (bundle) {
         // handle the message received
         if (bundle.command == 'request_init') {
-            var init_command = {};
-            init_command.command = 'init';
-            init_command.options = {};
-            init_command.options.username = USERNAME;
-            Port.send(init_command);
+            var init_bundle = Utils.get_init_bundle();
+            Port.send(init_bundle);
         } else if (bundle.command == "verify") {
             if (bundle.result.status === null)
                 return;
@@ -426,6 +431,9 @@ function look_for_compositors() {
         parent.appendChild(new_button);
     }
 }
+
+// initalize the native application on start
+Port.send(Utils.get_init_bundle());
 
 document.body.addEventListener("DOMSubtreeModified", look_for_signedmessages, false);
 document.body.addEventListener("DOMSubtreeModified", look_for_compositors, false);
