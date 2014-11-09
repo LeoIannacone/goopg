@@ -158,11 +158,12 @@ var Port = {
             }
         } else if (bundle.port_error) {
             var message = bundle.port_error;
-            if (message == 'Access to the specified native messaging host is forbidden.') {
+            if (message == 'Access to the specified native messaging host is forbidden.' ||
+                message == 'Specified native messaging host not found.') {
                 native_available = false;
                 setTimeout(function () {
-                    var installation = 'Please see the <a href="http://leoiannacone.github.io/goopg/">installation</a> instructions.';
-                    Alert.set('Goopg cannot communicate with the plugin. ' + installation);
+                    var installation = 'Please see the <span><a href="http://leoiannacone.github.io/goopg/">installation</a></span> instructions.';
+                    Alert.set('Goopg cannot communicate with the plugin. ' + message + ' ' + installation);
                 }, 5000);
             }
         }
