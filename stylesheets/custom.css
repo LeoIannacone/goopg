@@ -24,8 +24,8 @@ pre, code {
 
 pre {
     border-radius: 3px;
-    border: 1px solid white;
-    box-shadow: 0 1px 1px black inset;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) inset;
     padding: 10px 15px;
 }
 
