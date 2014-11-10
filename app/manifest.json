@@ -6,7 +6,7 @@
     "version": "0.0.4",
 
     "icons": {
-        "128": "logo128.png"
+        "128": "icon128.png"
     },
 
     "permissions": [
