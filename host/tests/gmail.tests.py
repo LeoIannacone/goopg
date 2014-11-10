@@ -8,8 +8,8 @@ from email.mime.text import MIMEText
 
 # change the syspath to import Gmail
 # FIX_ME: make module name
-current = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-sys.path.append(current)
+current = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current, '..'))
 
 from gmail import Gmail
 
@@ -36,7 +36,7 @@ class gmail_tests(unittest.TestCase):
         # strip receives
         my_receivers = [r.strip() for r in my_receivers]
 
-        receivers = GMail._get_receivers(m)
+        receivers = Gmail._get_receivers(m)
         self.assertEqual(receivers, my_receivers)
 
     def test_remove_bcc_from_header(self):
@@ -55,7 +55,7 @@ class gmail_tests(unittest.TestCase):
         m['Bcc'] = Bcc
         m['From'] = my_sender
 
-        new_message = GMail._remove_bcc_from_header(m)
+        new_message = Gmail._remove_bcc_from_header(m)
 
         # message must be a correct email (parsable)
         new_message = email.message_from_string(new_message)
