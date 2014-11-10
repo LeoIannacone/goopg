@@ -39,7 +39,7 @@ show result  <---  gateway (adapt to web if needed)  <---  send result
 
  * Gmail web interface might change HTML someday. As less as possible HTML modifications and interactions could prevent future work.
 
- * Even if surfing the web it is enough easy to find documentation about PGP, it seems there is a lack of tool/API and example showing how emails are verified/signed/encrypted/decrypted through PGP. Understanding deeply how it works, as well as how to get and send emails, can heavy delay the development.
+ * Even if surfing the web it is enough easy to find documentation about PGP, it seems there is a lack of tool/APIs and examples showing how emails are verified/signed/encrypted/decrypted through PGP. Understanding deeply how it works, as well as how to get and send emails, can heavy delay the development.
 
 
 ## Getting the original message
@@ -51,7 +51,7 @@ https://mail.google.com/mail/u/0/?ui=2&ik=%(auth_token)s&view=om&th=%(gmail_mess
 ```
 With:
  * `auto_token` - bundled in the Gmail HTML (variable GLOBALS at index 9)
- * `gmail_message_id``` - the Gmail internal message ID (known as ```X-GM-MSGID`), bundled as ClassName of messages in the HTML (starting with 'm')
+ * `gmail_message_id` - the Gmail internal message ID (known as `X-GM-MSGID`), bundled as ClassName of messages in the HTML (starting with 'm')
 
 Hence, get the `X-GM-MSGID` is simple as get the the div.ClassName.
 
@@ -112,7 +112,7 @@ bundle
 
   // main objects
   Utils: contain some utils
-  Alert: is the banner added to the verified messages
+  Alert: is used to show messages to the users (like "Message has been signed and sent")
   Port: is the port communication to send and receive bundles
   SingedMessage: represents a Gmail signed message in the current view of the web page
   SingSendButton: represent a 'Sing and Send' button of the compositors
@@ -160,7 +160,7 @@ The native application is placed in host directory and it is written in python.
 
 ### Structure
 
- * `chrome-main.py```: it is the main script executed by the browser. It reads from stdin the `bundle` sent by the gateway and writes to stdout a new `bundle` as the result of the operation. It calls CommandHandler to consume the ```bundle`.
+ * `chrome-main.py`: it is the main script executed by the browser. It reads from stdin the `bundle` sent by the gateway and writes to stdout a new `bundle` as the result of the operation. It calls CommandHandler to consume the `bundle`.
 
  * `commandhandler.py`: contains a class which takes care to parse the `bundle` and generates the result to send back. It calls GPGMail and Gmail classes to operate with messages. In the future in may call a ConfigurationParses to properly initalize the rest of the script
 
