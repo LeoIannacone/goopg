@@ -1,6 +1,4 @@
-# GPG for Gmail
-
-![logo.png](http://people.ubuntu.com/~l3on/goopg/logo-50perc.png)
+![logo.png](http://people.ubuntu.com/~l3on/goopg/logo.png)
 
 # Installation:
 The installation consists in two phases:
