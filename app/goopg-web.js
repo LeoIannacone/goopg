@@ -215,23 +215,32 @@ function SignedMessage(msg_id) {
         return this.div.parentElement.getElementsByTagName("span");
     };
 
-    // hide an attachment given a filename
-    this.hide_attachment = function (filename) {
+    // get the attchment as HTML element
+    this.get_attachment = function (filename) {
         var attachments = this.get_attachments();
         var url_regex = new RegExp(':' + filename + ':https://mail.google.com/');
         for (var i = 0; i < attachments.length; i++) {
             var attach = attachments[i];
             var download_url = attach.getAttribute("download_url");
             if (download_url && download_url.match(url_regex)) {
-                // this is the sign attachment
-                attach.style.display = "none";
-                if (attach.parentElement.children.length == 2) {
-                    // it was only one attachment, hide the whole attachments box
-                    attach.parentElement.parentElement.style.display = "none";
-                }
-                return true;
+                return attach;
             }
         }
+        return null;
+    };
+
+    // hide an attachment given a filename
+    this.hide_attachment = function (filename) {
+        var attach = this.get_attachment(filename);
+        if (attach === null)
+            return false;
+
+        attach.style.display = "none";
+        if (attach.parentElement.children.length == 2) {
+            // it was only one attachment, hide the whole attachments box
+            attach.parentElement.parentElement.style.display = "none";
+        }
+        return true;
     };
 
     // build the banner
@@ -421,14 +430,18 @@ function look_for_signedmessages() {
             }
         }
         if (id) {
-            var msg = {};
+            var bundle = {};
             // guess if message is GPG signed inline
             var body = messages[i].innerText;
             if (body.indexOf('-----BEGIN PGP SIGNATURE-----') >= 0)
-                msg.force = true;
-            msg.command = "verify";
-            msg.id = id;
-            Port.send(msg);
+                bundle.force = true;
+            // This will not work, since Gmail has not yet showed the attachments
+            // this message.
+            // else if (new SignedMessage(id).get_attachment('signature.asc'))
+            //     bundle.force = true;
+            bundle.command = "verify";
+            bundle.id = id;
+            Port.send(bundle);
         }
     }
 }
