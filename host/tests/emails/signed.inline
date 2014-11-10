@@ -1,0 +1,39 @@
+                                                                                                                                                                                                                                                               
+Return-Path: <leo.iannacone@gmail.com>
+Received: from home (2-234-35-59.ip221.fastwebnet.it. [2.234.35.59])
+        by mx.google.com with ESMTPSA id m6sm13371067wiy.16.2014.11.10.05.09.18
+        for <info@leoiannacone.com>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Nov 2014 05:09:18 -0800 (PST)
+Message-ID: <1415624955.22522.1.camel@gmail.com>
+Subject: Singed in line
+From: Leo Iannacone <leo.iannacone@gmail.com>
+To: "info@leoiannacone.com" <info@leoiannacone.com>
+Date: Mon, 10 Nov 2014 14:09:15 +0100
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.12.7-0ubuntu1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+This is a signed inline email
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJUYLioAAoJEDMrlP7SgvwlLi4QAJ5xp8qGVaHh/onnNHk/h/j6
+licHGHVEPMUWuiZn0J0rgi/PnYniXjwb5YUghdNKOqO3rTUZ4JZEEAvRbBfN76HW
+ALWKdGGJ3kGkLyXs9F/cQCs0/1L0zv+ahbouhK/FmtKEVslVuhmTC1wKvDeF42t/
+QWrPIihVfH4fRiuwIuNrOtud68AsNIIyYoVGNOTsnN5yH+cjoapRbz71sbGGYMQW
+JDW+FQR1RpvjqJw3sioVz+YazwoI9nqPUjg3gdVWbEsvDKdeqZHSnla2mQTI/9Q8
+kK1op/4BTXSXqY3jSFQ3ikwAYHVKwdlFUEsZVRRlNMvtYEKynbROpJ2sI9j/zOYS
+1xKoLNAERPz/t/a9VjkBrC8W6uZJy3PoQ/3CJPVwMT9sS94HG8fzECtMu5PW2gLK
+MmXjmOH0g+FYOqm84hKvE1RZ1MfLmPLZfggSVKGaM2NvgWAH44Nkvyp4Oj1Llodt
+avK2aegOF5XhFslc9HjeF0OO2gT6S2l7TLF7r8TOkJ6f+ipJszWyLIHQApqLMUIC
+g/m4ITNwTsLo/Tys1Yuwjop7nw+RIN/rRERfjm0pGWjSpF9ndcvCK/odYtwU/8oF
+dZBlaYAR9urn2V/alNsCcoXzY2kEr59FhP7SkYY6njaDxPyqhIYroopboKKIzzwA
+D+y5Rrhvg3eTXdbXgEk4
+=hx2T
+-----END PGP SIGNATURE-----
+

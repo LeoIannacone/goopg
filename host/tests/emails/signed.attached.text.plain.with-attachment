@@ -1,0 +1,84 @@
+                                                                                                                                                                                                                                                               
+Return-Path: <leo.iannacone@gmail.com>
+Received: from leoiannacone.com (2-234-35-59.ip221.fastwebnet.it. [2.234.35.59])
+        by mx.google.com with ESMTPSA id a8sm13378433wiz.21.2014.11.10.05.16.58
+        for <info@leoiannacone.com>
+        (version=TLSv1 cipher=RC4-SHA bits=128/128);
+        Mon, 10 Nov 2014 05:16:59 -0800 (PST)
+Sender: Leo Iannacone <leo.iannacone@gmail.com>
+Received: by leoiannacone.com (sSMTP sendmail emulation); Mon, 10 Nov 2014 14:16:55 +0100
+Message-ID: <1415625415.22522.7.camel@ubuntu.com>
+Subject: Singed (attached) email  with attachments
+From: Leo Iannacone <l3on@ubuntu.com>
+To: "info@leoiannacone.com" <info@leoiannacone.com>
+Date: Mon, 10 Nov 2014 14:16:55 +0100
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-O9rkV9LUfKLU2JGGPrfq"
+X-Mailer: Evolution 3.12.7-0ubuntu1 
+Mime-Version: 1.0
+
+
+--=-O9rkV9LUfKLU2JGGPrfq
+Content-Type: multipart/mixed; boundary="=-gKifldXUJwlC4Jq6JVUS"
+
+
+--=-gKifldXUJwlC4Jq6JVUS
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+This a signed email (RFC 3156) with attachments.
+
+The body of attachment is:
+
+"""
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum.
+"""
+
+without ".
+
+--=-gKifldXUJwlC4Jq6JVUS
+Content-Disposition: attachment; filename="lorem-ipsum.txt"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; name="lorem-ipsum.txt"; charset="UTF-8"
+
+TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
+c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+YSBhbGlxdWEuIFV0IGVuaW0gYWQgbWluaW0gdmVuaWFtLCBxdWlzIG5vc3RydWQgZXhlcmNpdGF0
+aW9uIHVsbGFtY28gbGFib3JpcyBuaXNpIHV0IGFsaXF1aXAgZXggZWEgY29tbW9kbyBjb25zZXF1
+YXQuIER1aXMgYXV0ZSBpcnVyZSBkb2xvciBpbiByZXByZWhlbmRlcml0IGluIHZvbHVwdGF0ZSB2
+ZWxpdCBlc3NlIGNpbGx1bSBkb2xvcmUgZXUgZnVnaWF0IG51bGxhIHBhcmlhdHVyLiBFeGNlcHRl
+dXIgc2ludCBvY2NhZWNhdCBjdXBpZGF0YXQgbm9uIHByb2lkZW50LCBzdW50IGluIGN1bHBhIHF1
+aSBvZmZpY2lhIGRlc2VydW50IG1vbGxpdCBhbmltIGlkIGVzdCBsYWJvcnVtLgo=
+
+
+--=-gKifldXUJwlC4Jq6JVUS--
+
+--=-O9rkV9LUfKLU2JGGPrfq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAABCgAGBQJUYLrHAAoJEDMrlP7SgvwlIQsP/3OpCG/jZoCdpxfpQUrKhwhq
+rqytvtUQsVVe94tffYx17HRUa8gWvmnMq9l2iZUWXbGaqQ19ZtAz/uxCip/Vwxl8
+bT9PKV+dJQa+xTNigzRtrJXNuzHAEdz8P79PAW4eBQq5HFM6jyLYCmfGf92PzeIg
+tfTdwfda4o81GH8HGVeI8P1XWL/1E9tkseQFMICJY72IBCVMZTWo+Acyv9PbtYfM
+Yh2bgRuaHbf8t4NgDdAu00WDFj/DrY+gPqb1aFShBgpH7KsmvrFSfghu59rzDOBf
+pjyo5ob354TK9K0BUl/G92TEmlbn6QcDz3nmL553gaADylE4yy0GMBHinqGiGakG
+sMpEYT+hcHxvYDX/ayIJzeA3XF3PSPteYv7TgwWCs7FmUJS9TFYNG/lnJQG22Ilu
+W4bRDZysxNtXn3e3JQ3Buuel/j69zWPOysc9Q+EAYmCGAyRRhlGB/wqPQh6bViul
+T/TVCqn98BONiOQAS4qi/EW3fRLVLfUyiilLeLiyCxN/BGYnWSMQ6fEoR8ZmjEGO
+J71A7jO49RyFj4aDlx+lxSrCqa9AjSOsHBm5f+LWYETQIK3/MOZpKJqETK/OtnZK
+DqzOV7Afo86HPHQVKGGk0Z3Clrz0P+8klYBD9yAZ22u0mhJ0nc95Ow0SFbdkrYlQ
+3aT271HvDLCrGtabQbRu
+=n9oW
+-----END PGP SIGNATURE-----
+
+--=-O9rkV9LUfKLU2JGGPrfq--

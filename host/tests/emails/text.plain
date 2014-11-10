@@ -1,0 +1,20 @@
+                                                                                                                                                                                                                                                               
+Return-Path: <leo.iannacone@gmail.com>
+Received: from leoiannacone.com (2-234-35-59.ip221.fastwebnet.it. [2.234.35.59])
+        by mx.google.com with ESMTPSA id w10sm23290192wje.10.2014.11.10.05.47.06
+        for <info@leoiannacone.com>
+        (version=TLSv1 cipher=RC4-SHA bits=128/128);
+        Mon, 10 Nov 2014 05:47:08 -0800 (PST)
+Sender: Leo Iannacone <leo.iannacone@gmail.com>
+Received: by leoiannacone.com (sSMTP sendmail emulation); Mon, 10 Nov 2014 14:47:03 +0100
+Message-ID: <1415627223.22522.8.camel@ubuntu.com>
+Subject: Simple text
+From: Leo Iannacone <l3on@ubuntu.com>
+To: "info@leoiannacone.com" <info@leoiannacone.com>
+Date: Mon, 10 Nov 2014 14:47:03 +0100
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Mailer: Evolution 3.12.7-0ubuntu1 
+Mime-Version: 1.0
+
+This is a simple text email

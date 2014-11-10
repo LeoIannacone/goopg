@@ -1,0 +1,49 @@
+                                                                                                                                                                                                                                                               
+Return-Path: <leo.iannacone@gmail.com>
+Received: from leoiannacone.com (2-234-35-59.ip221.fastwebnet.it. [2.234.35.59])
+        by mx.google.com with ESMTPSA id bc1sm13371966wib.16.2014.11.10.05.12.05
+        for <info@leoiannacone.com>
+        (version=TLSv1 cipher=RC4-SHA bits=128/128);
+        Mon, 10 Nov 2014 05:12:06 -0800 (PST)
+Sender: Leo Iannacone <leo.iannacone@gmail.com>
+Received: by leoiannacone.com (sSMTP sendmail emulation); Mon, 10 Nov 2014 14:12:01 +0100
+Message-ID: <1415625121.22522.3.camel@ubuntu.com>
+Subject: Signed attached
+From: Leo Iannacone <l3on@ubuntu.com>
+To: "info@leoiannacone.com" <info@leoiannacone.com>
+Date: Mon, 10 Nov 2014 14:12:01 +0100
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-NwM/4p8Yj4XkhKxD8n7L"
+X-Mailer: Evolution 3.12.7-0ubuntu1 
+Mime-Version: 1.0
+
+
+--=-NwM/4p8Yj4XkhKxD8n7L
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+This is a RFC 3156 email (text/plain)
+
+--=-NwM/4p8Yj4XkhKxD8n7L
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAABCgAGBQJUYLmhAAoJEDMrlP7Sgvwlz7gP/j8tDHIrnr7xnbkT9HMtheoe
+i9/mYXYSeCat5XTcJQDIplmCzYWTVwxsfJucxkc1zu3NAsk4cD870oIUyDIqZ9Ov
+oZChf6iPgIOwQ+vgz8XDqufla1pnI32RYhZPMxnY5TjlH/QvGwjVIaKAR2iVCLm9
+1kMGJzV9JQPCZrxkp0fnCU18eWrEhefNZD2GF/tFJJTEexXOI2o1SZg9EkT4FLQY
+W+10Mr0K9Vu2gTXo3AbQXRHd3pSjJGei8InSRDGK55spy+ks1pSHCUP9/DFRc9Y4
+FGwixSRH+7laAp/lyrDPzr7WXqJE2D7X0tWtDoWT0uiw2hnCFGiwAoniDdctqUwA
+GPs4qV6dn5biF+vdihAUIKt7bwR9UyKAWz9eEKXWCzNy8/7UVP5kj6jbA3Wz/Tyk
+6hreo+hlhhXyTD2MtY7i5IG/qS9ypPIVbqz9Ol1ARjqMmg4pWIMu8LNF7sWAE3tH
+y9grNoe7vce+phjfgflpbJvJIjDGq1hhxd8fetOEUsGuwhBEhC4E+6n0bkWbmYFo
+Y84oWHMhnDcxyoy89j+mBW/NGiFRoUH41j+qXMgyYpHmG4/6Du/yhSVi5msbDCMc
+krW5oL5ZveXMq5Y4kSVVn7r0Xz9sj1DrL552gtqzftL3WKOePz1x0X+uqAEFKS0j
+lMGZ6DXOypG8oeFNfCfL
+=5cpm
+-----END PGP SIGNATURE-----
+
+--=-NwM/4p8Yj4XkhKxD8n7L--
