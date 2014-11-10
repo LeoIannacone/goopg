@@ -4,6 +4,10 @@
     top: 10px;
 }
 
+header {
+    background: url("../images/icon96.png") no-repeat right;
+}
+
 *, body, pre, header h1, h1, h2, h3, footer {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 300;
