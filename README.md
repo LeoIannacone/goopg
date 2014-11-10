@@ -1,5 +1,7 @@
 ![logo.png](http://people.ubuntu.com/~l3on/goopg/logo.png)
 
+An extension for the **Chrome** and the **Chromium** browser which enables GPG sign and verification in the Gmail web page.
+
 # Installation:
 The installation consists in two phases:
  * Install the browser extension from [this link](https://chrome.google.com/webstore/detail/goopg/ifpoaednafmgolabhpjmbimllaoidelg)
