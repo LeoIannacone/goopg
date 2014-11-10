@@ -22,3 +22,5 @@ If you would like to help in developing, take a look at the [dev-install](doc/de
 
 # Donate
 If you like this project, please consider a donation. See the [homepage](http://leoiannacone.github.io/goopg/) for more info.
+
+This project is not affiliated with Google.
