@@ -1,9 +1,13 @@
 #!/bin/bash
+# [SublimeLinter shellcheck-exclude:"SC2046"]
 
 # This files prepares the zip to upload to the Chrome Store
 
+
+set -e
+
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd $DIR
+cd "$DIR"
 
 # build the css
 make -C lib/ >/dev/null
@@ -15,7 +19,7 @@ mkdir -p  $TMP_DIR/lib/css
 mkdir -p  $TMP_DIR/lib/fonts
 
 # copy the the files
-cp *.js *.png *.json $TMP_DIR
+cp ./*.js ./*.png ./*.json $TMP_DIR
 for subdir in "lib/css" "lib/fonts" ; do
     cp -r "$subdir" "$TMP_DIR/lib"
 done
@@ -30,6 +34,6 @@ sed "s|@EXT_ID@|$EXT_ID|" "$TEMPLATE" > "$TMP_DIR/$EXT_ID_FILE"
 # make the zip
 cd $TMP_DIR
 ZIP_NAME=~/goopg-chrome-store.zip
-zip $ZIP_NAME `find -type f` > /dev/null
+zip $ZIP_NAME $(find -type f) > /dev/null
 
 echo File $ZIP_NAME created

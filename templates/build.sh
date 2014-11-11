@@ -1,7 +1,4 @@
-#!/bin/sh
-# Copyright 2013 The Chromium Authors. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+#!/bin/bash
 
 set -e
 
@@ -15,7 +12,7 @@ BROWSER=$2
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
-if [ "$BROWSER" == "" ] ; then
+if [ "$BROWSER" = "" ] ; then
   BROWSER="chromium"
 fi
 
@@ -23,20 +20,20 @@ if [ "$BROWSER" != "chromium" -a "$BROWSER" != "google-chrome" ] ; then
   usage
 fi
 
-if [ "$EXT_ID" == "" ]; then
+if [ "$EXT_ID" = "" ]; then
   usage
 fi
 
-if [ "$TARGET_DIR" == "" ] ; then
+if [ "$TARGET_DIR" = "" ] ; then
   TARGET_DIR="$HOME/.config/$BROWSER/NativeMessagingHosts"
 fi
 
-if [ "$HOST_PATH" == "" ] ; then
-  HOST_PATH=`realpath "$DIR/../host"`
+if [ "$HOST_PATH" = "" ] ; then
+  HOST_PATH=$(realpath "$DIR/../host")
 fi
 
 # Create directory to store native messaging host.
-mkdir -p $TARGET_DIR
+mkdir -p "$TARGET_DIR"
 
 # Copy native messaging host manifest.
 JSON="com.leoiannacone.goopg.json"
@@ -50,7 +47,7 @@ sed -i "s|@EXT_ID@|$EXT_ID|" "$TARGET_DIR/$JSON"
 # Set permissions for the manifest so that all users can read it.
 chmod o+r "$TARGET_DIR/$JSON"
 
-echo Native messaging host $JSON has been installed. $TARGET_DIR/$JSON
+echo Native messaging host $JSON has been installed. "$TARGET_DIR/$JSON"
 
 # make the goopg-web-extension-id
 JS=goopg-web-extension-id.js
