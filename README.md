@@ -1,4 +1,4 @@
-![logo.png](http://people.ubuntu.com/~l3on/goopg/logo.png)
+![logo.png](http://leoiannacone.github.io/goopg/images/logo.png)
 
 Goopg is an extension for the **Chrome** and the **Chromium** browser which enables GPG sign and verification in the Gmail web page.
 

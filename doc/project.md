@@ -1,4 +1,4 @@
-![logo](http://people.ubuntu.com/~l3on/goopg/logo.png)
+![logo](http://leoiannacone.github.io/goopg/images/logo.png)
 
 # Requirements
 
