@@ -1,7 +1,8 @@
 # Installation for developers
 
 ### Remove other installations
-If you installed the Goopg plugins and extensions, please remove them before continue.
+If you installed the Goopg plugins and extensions, please remove them before
+continue.
 
 ### Deps
 Install these dependencies:
@@ -10,7 +11,8 @@ sudo apt-get install node-less python-googleapi python-gflags python-xdg python-
 ```
 
 ### Build the css
-If your distribution ships the `libjs-bootstrap` package, install it! (otherwise bootstrap will be downloaded):
+If your distribution ships the `libjs-bootstrap` package, install it! (otherwise
+bootstrap will be downloaded):
 
 ```bash
 cd app/lib
@@ -25,18 +27,16 @@ cd -
 
 
 ### Update the app ID and install the host
-Once extension is installed, get the `NEW_ID` extension in chrome://extension and run the following commands:
+Once extension is installed, get the `NEW_ID` of extension in chrome://extension
+and run the following commands:
 ```bash
 cd templates
 NEW_ID=the_id_you_found
-BROWSER=your_browser # (chrome or chromium)
+BROWSER=your_browser # (google-chrome or chromium)
 bash build.sh $NEW_ID $BROWSER
 cd -
 ```
 Reload http://gmail.com
 
-
-
 # About logging
-
 For log information, see the ```~/.cache/goopg/log file```
