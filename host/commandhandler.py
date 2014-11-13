@@ -19,10 +19,14 @@ class CommandHandler(object):
         command = bundle["command"]
         if command == 'init':
             result = self.init(bundle)
-        elif command == 'verify':
-            result = self.verify(bundle)
-        elif command == 'sign':
-            result = self.sign(bundle)
+        else:
+            # do nothing if not intialized
+            if not self.initialized:
+                return False
+            if command == 'verify':
+                result = self.verify(bundle)
+            elif command == 'sign':
+                result = self.sign(bundle)
         return result
 
     def init(self, bundle):
@@ -35,7 +39,7 @@ class CommandHandler(object):
         return True
 
     def verify(self, bundle):
-        if not self.initialized:
+        if not bundle["id"]:
             return False
 
         id = bundle['id']
@@ -67,14 +71,15 @@ class CommandHandler(object):
         return None
 
     def sign(self, bundle):
-        if not self.initialized or not bundle["id"]:
+        if not bundle["id"]:
             return False
         result = False
+        id = bundle['id']
         try:
-            draft = self.gmail.get(bundle["id"])
+            draft = self.gmail.get(id)
             new_message = self.gpgmail.sign(draft)
             if new_message:
-                self.gmail.send(bundle["id"], new_message)
+                self.gmail.send(id, new_message)
                 result = True
         except Exception, e:
             self.logger.exception(e)
