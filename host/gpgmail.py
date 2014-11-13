@@ -11,8 +11,11 @@ from gnupg import GPG
 
 class GPGMail(object):
 
-    def __init__(self):
-        self.gpg = GPG(use_agent=True)
+    def __init__(self, gpg=None):
+        if gpg:
+            self.gpg = gpg
+        else:
+            self.gpg = GPG(use_agent=True)
 
     def _armor(self, container, message, signature):
         """

@@ -1,3 +1,4 @@
+from gnupg import GPG
 from gpgmail import GPGMail
 from gmail import Gmail
 
@@ -7,6 +8,7 @@ import logging
 class CommandHandler(object):
 
     def __init__(self):
+        self.gpg = None
         self.gmail = None
         self.gpgmail = None
         self.initialized = False
@@ -26,7 +28,8 @@ class CommandHandler(object):
     def init(self, bundle):
         if not 'options' in bundle and not 'username' in bundle['options']:
             return False
-        self.gpgmail = GPGMail()
+        self.gpg = GPG(use_agent=True)
+        self.gpgmail = GPGMail(self.gpg)
         self.gmail = Gmail(bundle['options']['username'])
         self.initialized = True
         return True
