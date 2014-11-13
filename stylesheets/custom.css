@@ -1,8 +1,4 @@
-#downloads {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
+
 
 header {
     background: url("../images/icon96.png") no-repeat right;
@@ -54,7 +50,22 @@ a:hover {
     border-bottom: 1px dotted #888;
 }
 
-a#view-on-github:hover {
+#downloads {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 200px;
+}
+
+#downloads .button {
+    margin-bottom: 10px;
+}
+
+#view-on-google span {
+    background: transparent url(../images/gplus-23.png) 16px 50% no-repeat;
+}
+
+#downloads a:hover {
     color: #303030;
 }
 
