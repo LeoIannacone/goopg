@@ -27,6 +27,8 @@ class CommandHandler(object):
                 result = self.verify(bundle)
             elif command == 'sign':
                 result = self.sign(bundle)
+            elif command == 'import':
+                result = self.import_key(bundle)
         return result
 
     def init(self, bundle):
@@ -39,7 +41,7 @@ class CommandHandler(object):
         return True
 
     def verify(self, bundle):
-        if not bundle["id"]:
+        if not 'id' in bundle:
             return False
 
         id = bundle['id']
@@ -71,7 +73,7 @@ class CommandHandler(object):
         return None
 
     def sign(self, bundle):
-        if not bundle["id"]:
+        if not 'id' in bundle:
             return False
         result = False
         id = bundle['id']
@@ -85,3 +87,18 @@ class CommandHandler(object):
             self.logger.exception(e)
         finally:
             return result
+
+    def import_key(self, bundle):
+        if not 'id' in bundle:
+            return False
+
+        imp = self.gpg.recv_keys('keyserver.ubuntu.com', bundle['id'])
+
+        result = imp.imported > 0
+        complete_result = imp.results[0]
+        self.logger.info("import key {} - {}: {}".format(
+                         complete_result['fingerprint'],
+                         result,
+                         complete_result['text']))
+
+        return result

@@ -3,15 +3,10 @@
     margin-bottom: 15px;
 }
 
-.goopg .alert-header {
-    cursor: pointer;
-}
-
-.goopg .alert span {
+.goopg .alert .glyphicon {
     padding: 0;
-    margin: 0;
+    margin: -3px 0px 0px 3px;;
     font-size: 140%;
-    margin-top: -3px;
 }
 
 .goopg .alert .raw {

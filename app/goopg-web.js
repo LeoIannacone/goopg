@@ -5,12 +5,14 @@ var USERNAME = GLOBALS[10];
 
 
 // my css classes
+var GOOPG_CLASS_BANNER = "goopg";
 var GOOPG_CLASS_PREFIX = "goopg-";
 var GOOPG_CLASS_CHECKED = GOOPG_CLASS_PREFIX + "checked";
 var GOOPG_CLASS_STDERR = GOOPG_CLASS_PREFIX + "stderr";
 var GOOPG_CLASS_SENDBUTTON = GOOPG_CLASS_PREFIX + "sendbutton";
 var GOOPG_CLASS_ALERT = GOOPG_CLASS_PREFIX + "alert";
 var GOOPG_CLASS_KEYID = GOOPG_CLASS_PREFIX + "keyid-";
+var GOOPG_CLASS_IMPORT = GOOPG_CLASS_PREFIX + "import-";
 var GOOPG_CLASS_MSG_SIGNINLINE = GOOPG_CLASS_PREFIX + 'signinline';
 
 
@@ -156,6 +158,24 @@ var Port = {
                     button.innerHTML = "Sign and Send";
                 }
             }
+        } else if (bundle.command == "import") {
+            if (bundle.result === true) {
+                var messages = document.getElementsByClassName(GOOPG_CLASS_KEYID + bundle.id);
+                for (var i = 0; i < messages.length; i++) {
+                    var message = messages[i];
+                    for (var j = 0; j < message.classList.length; j++) {
+                        if (message.classList[j].length > 5 && message.classList[j][0] == "m") {
+                            var id = message.classList[j].substring(1);
+                            var bundle_verify = {};
+                            bundle_verify.command = "verify";
+                            bundle_verify.force = true;
+                            bundle_verify.id = id;
+                            Port.send(bundle_verify);
+                            break;
+                        }
+                    }
+                }
+            }
         } else if (bundle.port_error) {
             var message = bundle.port_error;
             if (message == 'Access to the specified native messaging host is forbidden.' ||
@@ -174,6 +194,7 @@ var Port = {
 function SignedMessage(msg_id) {
 
     this.msg_id = msg_id;
+    this.key_id = null;
     this.div = document.getElementsByClassName("m" + msg_id)[0];
 
     this.exists = function () {
@@ -244,14 +265,21 @@ function SignedMessage(msg_id) {
     };
 
     // build the banner
-    this.add_banner = function (gpg) {
+    this.add_banner = function (gpg, force) {
         if (!this.exists())
             return;
         if (gpg.status === undefined || gpg.status === null)
             return;
 
+        var existing_banner = this.div.getElementsByClassName(GOOPG_CLASS_BANNER);
+        if (existing_banner.length == 1)
+            this.div.removeChild(existing_banner[0]);
+
+        this.key_id = gpg.key_id;
+
         var className;
         var icon;
+        var import_key = false;
 
         var key_id = gpg.key_id;
         // // show the whole key and add a space every 4 chars
@@ -276,6 +304,7 @@ function SignedMessage(msg_id) {
             icon = "question-sign";
             className = "warning";
             text = "public key " + key_id + " not found";
+            import_key = true;
         } else if (gpg.valid) {
             icon = "ok-sign";
             className = "success";
@@ -290,9 +319,33 @@ function SignedMessage(msg_id) {
 
         var header = document.createElement("div");
         header.className = "alert-header";
-        header.innerHTML =
-            "<span class=\"pull-right glyphicon glyphicon-" + icon + "\"></span>" +
-            "<strong>" + Utils.capitalize(gpg.status) + ":</strong> " + Utils.escape_html(text);
+        var icon_status = "<span class=\"pull-right glyphicon glyphicon-" + icon + "\"></span>";
+        header.innerHTML = icon_status;
+        // if import_key, add the import button
+        if (import_key) {
+            var icon_import = document.createElement("span");
+            icon_import.className = "pull-right glyphicon glyphicon-download ";
+            icon_import.className += GOOPG_CLASS_IMPORT + this.key_id;
+            icon_import.title = "Import the key";
+            icon_import.addEventListener("click", function (event) {
+                event.stopPropagation();
+                var button = event.target;
+                for (var i = 0; i < button.classList.length; i++) {
+                    if (button.classList[i].indexOf(GOOPG_CLASS_IMPORT) >= 0) {
+                        var key_id = button.classList[i].replace(GOOPG_CLASS_IMPORT, '');
+                        var bundle = {};
+                        bundle.command = 'import';
+                        bundle.id = key_id;
+                        Port.send(bundle);
+                        break;
+                    }
+                }
+            });
+            header.appendChild(icon_import);
+        }
+        var span_text = document.createElement('span');
+        span_text.innerHTML = "<strong>" + Utils.capitalize(gpg.status) + ":</strong> " + Utils.escape_html(text);
+        header.appendChild(span_text);
         banner.appendChild(header);
 
         if (gpg.stderr) {
@@ -303,13 +356,14 @@ function SignedMessage(msg_id) {
             header.addEventListener("click", function () {
                 Utils.toggle_display(this.parentElement.getElementsByClassName(GOOPG_CLASS_STDERR)[0]);
             });
+            header.style.cursor = "pointer";
             stderr.innerHTML = Utils.escape_html(gpg_stderr_clean);
             banner.appendChild(stderr);
         }
 
         // wrap the banner
         var wrapper = document.createElement("div");
-        wrapper.className = "goopg";
+        wrapper.className = GOOPG_CLASS_BANNER;
         wrapper.appendChild(banner);
         this.div.insertBefore(wrapper, this.div.firstChild);
 
