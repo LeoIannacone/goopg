@@ -2,9 +2,10 @@ Source: goopg
 Section: python
 Priority: extra
 Maintainer: Leo Iannacone <l3on@ubuntu.com>
-Build-Depends:
- debhelper (>= 8)
- , dh-buildinfo
+Build-Depends: debhelper (>= 8),
+               dh-buildinfo,
+               dh-python,
+               python | python-all | python-dev | python-all-dev
 Standards-Version: 3.9.6
 Homepage: http://leoiannacone.github.io/goopg/
 Vcs-Git: git://github.com/LeoIannacone/goopg.git
@@ -12,12 +13,12 @@ Vcs-Browser: https://github.com/LeoIannacone/goopg/
 
 Package: goopg-common
 Architecture: all
-Depends: ${misc:Depends}
- , python
- , python-googleapi
- , python-gflags
- , python-xdg
- , python-gnupg
+Depends: python,
+         python-gflags,
+         python-gnupg,
+         python-googleapi,
+         python-xdg,
+         ${misc:Depends}
 Description: GPG for Gmail - common files
  Goopg is a an extension for Gmail which allows one to verify and sign
  emails in Gmail web page.
@@ -26,8 +27,7 @@ Description: GPG for Gmail - common files
 
 Package: goopg-chrome
 Architecture: all
-Depends: ${misc:Depends}
- , goopg-common (= ${binary:Version})
+Depends: goopg-common (= ${binary:Version}), ${misc:Depends}
 Description: GPG for Gmail - Chrome browser plugin
  Goopg is a an extension for Gmail which allows one to verify and sign
  emails in Gmail web page.
@@ -36,8 +36,7 @@ Description: GPG for Gmail - Chrome browser plugin
 
 Package: goopg-chromium
 Architecture: all
-Depends: ${misc:Depends}
- , goopg-common (= ${binary:Version})
+Depends: goopg-common (= ${binary:Version}), ${misc:Depends}
 Description: GPG for Gmail - Chromium browser plugin
  Goopg is a an extension for Gmail which allows one to verify and sign
  emails in Gmail web page.
