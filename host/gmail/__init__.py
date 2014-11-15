@@ -15,7 +15,7 @@ from multiprocessing import Process, Queue
 
 from xdg import BaseDirectory
 
-from util import StreamToLogger
+from logger import StreamToLogger
 
 
 # Check https://developers.google.com/gmail/api/auth/scopes
