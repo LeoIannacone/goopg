@@ -330,6 +330,11 @@ function SignedMessage(msg_id) {
             icon_import.addEventListener("click", function (event) {
                 event.stopPropagation();
                 var button = event.target;
+                // change the icon status
+                button.style.opacity = '0.3';
+                button.className = event.target.className.replace('glyphicon-download', 'glyphicon-cloud-download');
+                button.title = "Importing ...";
+                // get the key and send the "import" bundle
                 for (var i = 0; i < button.classList.length; i++) {
                     if (button.classList[i].indexOf(GOOPG_CLASS_IMPORT) >= 0) {
                         var key_id = button.classList[i].replace(GOOPG_CLASS_IMPORT, '');
