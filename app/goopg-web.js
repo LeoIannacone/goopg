@@ -510,13 +510,13 @@ function BundleHandler(bundle) {
             }
         }
     } else if (bundle.port_error) {
-        var message = bundle.port_error;
-        if (message == 'Access to the specified native messaging host is forbidden.' ||
-            message == 'Specified native messaging host not found.') {
+        var error_message = bundle.port_error;
+        if (error_message == 'Access to the specified native messaging host is forbidden.' ||
+            error_message == 'Specified native messaging host not found.') {
             native_available = false;
             setTimeout(function () {
                 var installation = 'Please see the <span><a href="http://leoiannacone.github.io/goopg/">installation</a></span> instructions.';
-                Alert.set('Goopg cannot communicate with the plugin. ' + message + ' ' + installation);
+                Alert.set('Goopg cannot communicate with the plugin. ' + error_message + ' ' + installation);
             }, 5000);
         }
     }
