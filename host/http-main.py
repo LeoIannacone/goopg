@@ -23,7 +23,8 @@ class GoopgHandler(BaseHTTPRequestHandler):
         bundle = self.from_path_to_bundle()
 
         if not 'command' in bundle:
-            self.send_response(404)
+            self.send_response(400)
+            self.end_headers()
             return
 
         self.send_response(200)
