@@ -37,11 +37,11 @@ class CommandHandler(object):
         return result
 
     def init(self, bundle):
-        if not 'options' in bundle and not 'username' in bundle['options']:
+        if not 'username' in bundle:
             return False
         self.gpg = GPG(use_agent=True)
         self.gpgmail = GPGMail(self.gpg)
-        self.gmail = Gmail(bundle['options']['username'])
+        self.gmail = Gmail(bundle['username'])
         self.initialized = True
         return {'version': VERSION}
 
