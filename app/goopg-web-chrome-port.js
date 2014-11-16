@@ -31,4 +31,9 @@ var Port = {
         }
     },
 
+    handler: function (bundle) {
+        // This must is implemented elsewhere
+        return;
+    }
+
 };
