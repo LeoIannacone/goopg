@@ -4,6 +4,8 @@ from gmail import Gmail
 
 import logging
 
+VERSION = "0.2.0"
+
 
 class CommandHandler(object):
 
@@ -38,7 +40,7 @@ class CommandHandler(object):
         self.gpgmail = GPGMail(self.gpg)
         self.gmail = Gmail(bundle['options']['username'])
         self.initialized = True
-        return True
+        return {'version': VERSION}
 
     def verify(self, bundle):
         if not 'id' in bundle:

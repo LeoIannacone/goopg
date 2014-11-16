@@ -3,6 +3,7 @@
 // get the username
 var USERNAME = GLOBALS[10];
 
+var PLUGIN_MIN_VERSION = '0.2.0';
 
 // my css classes
 var GOOPG_CLASS_BANNER = "goopg";
@@ -65,6 +66,26 @@ var Utils = {
         bundle.options = {};
         bundle.options.username = USERNAME;
         return bundle;
+    },
+
+    check_version: function (version) {
+        if (version === undefined || version === null)
+            return false;
+        var got_version = version.split('.');
+        var required_version = PLUGIN_MIN_VERSION.split('.');
+        var result = false;
+        for (var i = 0; i < required_version.length; i++) {
+            if (i >= got_version.length)
+                break;
+            var i_got = got_version[i];
+            var i_required = required_version[i];
+            result = true;
+            if (i_got < i_required) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 };
 
@@ -138,6 +159,15 @@ var Port = {
         if (bundle.command == 'request_init') {
             var init_bundle = Utils.get_init_bundle();
             Port.send(init_bundle);
+        } else if (bundle.command == "init") {
+            native_available = Utils.check_version(bundle.result.version);
+            if (!native_available) {
+                setTimeout(function () {
+                    var installation = 'Please update your system or check the <span><a href="http://leoiannacone.github.io/goopg/">installation</a></span> instructions.';
+                    Alert.set('This version of Goopg requires ' + PLUGIN_MIN_VERSION + ' minimum plugin version.<br />' + installation);
+                }, 5000);
+            }
+
         } else if (bundle.command == "verify") {
             if (bundle.result.status === null)
                 return;
