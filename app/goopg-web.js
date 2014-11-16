@@ -313,7 +313,6 @@ function SignedMessage(msg_id) {
 }
 
 
-
 var SignSendButton = {
     // build the button element
     get: function () {
@@ -406,57 +405,7 @@ var SignSendButton = {
 };
 
 
-function look_for_signedmessages() {
-    if (native_available === false)
-        return;
-    var messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
-    for (var i = 0; i < messages.length; i++) {
-        var id = null;
-        var classList = messages[i].classList;
-        if (classList.contains(GOOPG_CLASS_CHECKED))
-            continue;
-        for (var j = 0; j < classList.length; j++) {
-            if (classList[j].length > 5 && classList[j][0] == "m") {
-                id = classList[j].substring(1);
-                messages[i].classList.add(GOOPG_CLASS_CHECKED);
-                break;
-            }
-        }
-        if (id) {
-            var bundle = {};
-            // guess if message is GPG signed inline
-            var body = messages[i].innerText;
-            if (body.indexOf('-----BEGIN PGP SIGNATURE-----') >= 0)
-                bundle.force = true;
-            // This will not work, since Gmail has not yet showed the attachments
-            // this message.
-            // else if (new SignedMessage(id).get_attachment('signature.asc'))
-            //     bundle.force = true;
-            bundle.command = "verify";
-            bundle.id = id;
-            Port.send(bundle);
-        }
-    }
-}
-
-function look_for_compositors() {
-    if (native_available === false)
-        return;
-    var sendButtons = document.getElementsByClassName(GOOGLE_CLASS_SENDBUTTON);
-    // append the sign&send button
-    for (var i = 0; i < sendButtons.length; i++) {
-        var button = sendButtons[i];
-        var parent = button.parentNode;
-        if (parent.className.indexOf(GOOPG_CLASS_CHECKED) > -1)
-            continue;
-        parent.className += ' ' + GOOPG_CLASS_CHECKED;
-        var new_button = SignSendButton.get(button);
-        new_button.addEventListener("click", SignSendButton.on_click);
-        parent.appendChild(new_button);
-    }
-}
-
-// the handler
+// the generic bundle handler
 function BundleHandler(bundle) {
     // handle the message received
     if (bundle.command == 'request_init') {
@@ -519,6 +468,58 @@ function BundleHandler(bundle) {
                 Alert.set('Goopg cannot communicate with the plugin. ' + error_message + ' ' + installation);
             }, 5000);
         }
+    }
+}
+
+
+function look_for_signedmessages() {
+    if (native_available === false)
+        return;
+    var messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
+    for (var i = 0; i < messages.length; i++) {
+        var id = null;
+        var classList = messages[i].classList;
+        if (classList.contains(GOOPG_CLASS_CHECKED))
+            continue;
+        for (var j = 0; j < classList.length; j++) {
+            if (classList[j].length > 5 && classList[j][0] == "m") {
+                id = classList[j].substring(1);
+                messages[i].classList.add(GOOPG_CLASS_CHECKED);
+                break;
+            }
+        }
+        if (id) {
+            var bundle = {};
+            // guess if message is GPG signed inline
+            var body = messages[i].innerText;
+            if (body.indexOf('-----BEGIN PGP SIGNATURE-----') >= 0)
+                bundle.force = true;
+            // This will not work, since Gmail has not yet showed the attachments
+            // this message.
+            // else if (new SignedMessage(id).get_attachment('signature.asc'))
+            //     bundle.force = true;
+            bundle.command = "verify";
+            bundle.id = id;
+            Port.send(bundle);
+        }
+    }
+}
+
+
+function look_for_compositors() {
+    if (native_available === false)
+        return;
+    var sendButtons = document.getElementsByClassName(GOOGLE_CLASS_SENDBUTTON);
+    // append the sign&send button
+    for (var i = 0; i < sendButtons.length; i++) {
+        var button = sendButtons[i];
+        var parent = button.parentNode;
+        if (parent.className.indexOf(GOOPG_CLASS_CHECKED) > -1)
+            continue;
+        parent.className += ' ' + GOOPG_CLASS_CHECKED;
+        var new_button = SignSendButton.get(button);
+        new_button.addEventListener("click", SignSendButton.on_click);
+        parent.appendChild(new_button);
     }
 }
 
