@@ -1,3 +1,15 @@
+goopg (0.2.0) unstable; urgency=medium
+
+  [Leo Iannacone]
+  * Returns the version of the plugin on init bundle.
+  * Add import key handler.
+
+  [Kartik Mistry]
+  * Fix Debian install using dh_python2.
+  * Fix documentation style.
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Sun, 16 Nov 2014 16:50:34 +0100
+
 goopg (0.1.0) utopic; urgency=medium
 
   * Initial release.

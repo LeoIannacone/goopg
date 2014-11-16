@@ -3,7 +3,7 @@
 
     "name": "Goopg",
     "description": "GPG support for Gmail",
-    "version": "0.1.0",
+    "version": "0.2.0",
 
     "icons": {
         "128": "icon128.png"
