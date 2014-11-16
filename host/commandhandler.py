@@ -17,6 +17,9 @@ class CommandHandler(object):
         self.logger = logging.getLogger('CommandHandler')
 
     def parse(self, bundle):
+        if not 'command' in bundle:
+            self.logger.error("no command in bundle {}".format(bundle))
+            return None
         result = None
         command = bundle["command"]
         if command == 'init':
