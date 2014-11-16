@@ -9,6 +9,7 @@ function add_javascript_to_head(filename) {
 }
 
 add_javascript_to_head('goopg-web-extension-id.js');
+add_javascript_to_head('goopg-web-chrome-port.js');
 add_javascript_to_head('goopg-web.js');
 
 
