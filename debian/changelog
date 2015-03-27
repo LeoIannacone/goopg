@@ -1,4 +1,10 @@
-goopg (0.2.0) unstable; urgency=medium
+goopg (0.2.1) UNRELEASED; urgency=medium
+
+  * New host release.
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Fri, 27 Mar 2015 11:00:08 +0100
+
+goopg (0.2.0) UNRELEASED; urgency=medium
 
   [Leo Iannacone]
   * Returns the version of the plugin on init bundle.
@@ -10,7 +16,7 @@ goopg (0.2.0) unstable; urgency=medium
 
  -- Leo Iannacone <l3on@ubuntu.com>  Sun, 16 Nov 2014 16:50:34 +0100
 
-goopg (0.1.0) utopic; urgency=medium
+goopg (0.1.0) UNRELEASED; urgency=medium
 
   * Initial release.
 
