@@ -202,10 +202,10 @@ class Gmail():
                 receivers.append(message[header])
 
         receivers = ','.join(receivers).split(',')
-        # strip receivers
-        receivers = [r.strip() for r in receivers]
-
-        return receivers
+        addresses = []
+        for name, addr in email.utils.getaddresses(receivers):
+            addresses.append(addr)
+        return addresses
 
     @staticmethod
     def _remove_bcc_from_header(message):

@@ -34,10 +34,11 @@ class gmail_tests(unittest.TestCase):
 
         my_receivers = ', '.join([to, Cc, Bcc]).split(',')
         # strip receives
-        my_receivers = [r.strip() for r in my_receivers]
+        my_addresses = email.utils.getaddresses(my_receivers)
 
-        receivers = Gmail._get_receivers(m)
-        self.assertEqual(receivers, my_receivers)
+        addresses = Gmail._get_receivers(m)
+        for name, addr in my_addresses:
+            self.assertIn(addr, addresses)
 
     def test_remove_bcc_from_header(self):
         """
