@@ -1,3 +1,9 @@
+goopg (0.2.2) UNRELEASED; urgency=medium
+
+  * Fix Receivers addresses with comma.
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Fri, 27 Mar 2015 11:00:08 +0100
+
 goopg (0.2.1) UNRELEASED; urgency=medium
 
   * New host release.
