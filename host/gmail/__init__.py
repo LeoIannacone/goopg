@@ -203,7 +203,8 @@ class Gmail():
 
         addresses = []
         for name, addr in email.utils.getaddresses(receivers):
-            addresses.append(addr)
+            if not addr in addresses:
+                addresses.append(addr)
         return addresses
 
     @staticmethod

@@ -81,6 +81,20 @@ class gmail_tests(unittest.TestCase):
         self.assertIn("leo3@tests.com", addr)
         self.assertIn("leo@tests.com", addr)
 
+    def test_do_not_duplicate_senders(self):
+        """
+        Test if email is sent twice to the same receiver
+        """
+        my_sender = 'Me <me@tests.com>'
+        to = '"Leo2, Ianna" <leo@tests.com>, "Leo, Iannacone" <leo@tests.com>'
+        payload = 'This is the payload of test_remove_bcc_from_header'
+        m = MIMEText(payload)
+        m['To'] = to
+        m['From'] = my_sender
+        addr = Gmail._get_receivers(m)
+        self.assertEqual(1, len(addr))
+        self.assertIn("leo@tests.com", addr)
+
 
 if __name__ == '__main__':
     unittest.main()
