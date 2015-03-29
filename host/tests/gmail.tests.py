@@ -33,7 +33,6 @@ class gmail_tests(unittest.TestCase):
         m['From'] = my_sender
 
         my_receivers = ', '.join([to, Cc, Bcc]).split(',')
-        # strip receives
         my_addresses = email.utils.getaddresses(my_receivers)
 
         addresses = Gmail._get_receivers(m)
@@ -67,6 +66,20 @@ class gmail_tests(unittest.TestCase):
 
         # and must have the same payload
         self.assertEqual(payload, new_message.get_payload())
+
+    def test_allow_comma_in_receiver_issue_14(self):
+        """
+        Test if email is sent to the correct contact, containing comma in name
+        """
+        my_sender = 'Me <me@tests.com>'
+        to = '"Leo2, Ianna" <leo3@tests.com>, "Leo, Iannacone" <leo@tests.com>'
+        payload = 'This is the payload of test_remove_bcc_from_header'
+        m = MIMEText(payload)
+        m['To'] = to
+        m['From'] = my_sender
+        addr = Gmail._get_receivers(m)
+        self.assertIn("leo3@tests.com", addr)
+        self.assertIn("leo@tests.com", addr)
 
 
 if __name__ == '__main__':

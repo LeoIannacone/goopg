@@ -199,9 +199,8 @@ class Gmail():
         receivers = []
         for header in ['To', 'Cc', 'Bcc']:
             if header in message:
-                receivers.append(message[header])
+                receivers += message.get_all(header, [])
 
-        receivers = ','.join(receivers).split(',')
         addresses = []
         for name, addr in email.utils.getaddresses(receivers):
             addresses.append(addr)
