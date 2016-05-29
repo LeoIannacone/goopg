@@ -167,7 +167,7 @@ function SignedMessage(msg_id) {
 
     // get the attachments as HTML elements
     this.get_attachments = function () {
-        return this.div.parentElement.getElementsByTagName("span");
+        return this.div.parentElement.parentElement.getElementsByTagName("span");
     };
 
     // get the attchment as HTML element
@@ -478,20 +478,21 @@ function look_for_signedmessages() {
     var messages = document.getElementsByClassName(GOOGLE_CLASS_MESSAGE);
     for (var i = 0; i < messages.length; i++) {
         var id = null;
-        var classList = messages[i].classList;
+        var realMessage = messages[i].children[0]
+        var classList = realMessage.classList;
         if (classList.contains(GOOPG_CLASS_CHECKED))
             continue;
         for (var j = 0; j < classList.length; j++) {
             if (classList[j].length > 5 && classList[j][0] == "m") {
                 id = classList[j].substring(1);
-                messages[i].classList.add(GOOPG_CLASS_CHECKED);
+                realMessage.classList.add(GOOPG_CLASS_CHECKED);
                 break;
             }
         }
         if (id) {
             var bundle = {};
             // guess if message is GPG signed inline
-            var body = messages[i].innerText;
+            var body = realMessage.innerText;
             if (body.indexOf('-----BEGIN PGP SIGNATURE-----') >= 0)
                 bundle.force = true;
             // This will not work, since Gmail has not yet showed the attachments
