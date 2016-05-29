@@ -8,7 +8,7 @@ import logging
 from apiclient.discovery import build
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
-from oauth2client.tools import run
+from oauth2client.tools import run_flow, argparser
 
 from smtplib import SMTP, SMTPServerDisconnected
 from multiprocessing import Process, Queue
@@ -54,7 +54,7 @@ class Gmail():
             def _subprocess_login():
                 sys.stdout = StreamToLogger(self.logger, logging.DEBUG)
                 sys.stderr = StreamToLogger(self.logger, logging.ERROR)
-                queue.put(run(flow, storage, http=self.http))
+                queue.put(run_flow(flow, storage, argparser.parse_args([])))
 
             # A Queue to get the result from subprocess
             queue = Queue()
@@ -65,6 +65,7 @@ class Gmail():
             self.logger.debug("end login process")
             # Retrieve the credentials
             self.credentials = queue.get()
+            self.http = self.credentials.authorize(self.http)
 
         # Access to the Gmail APIs
         self._gmail_API_login()
