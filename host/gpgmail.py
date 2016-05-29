@@ -7,6 +7,9 @@ from email.message import Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
 from gnupg import GPG
+from gnupg import logger as GPGLogger
+
+import logging
 
 
 class GPGMail(object):
@@ -15,7 +18,11 @@ class GPGMail(object):
         if gpg:
             self.gpg = gpg
         else:
-            self.gpg = GPG(use_agent=True)
+            self.gpg = GPG(gpgbinary="gpg2", use_agent=True)
+
+        GPGLogger.setLevel(logging.DEBUG)
+
+        self.logger = logging.getLogger('GPGMail')
 
     def _armor(self, container, message, signature):
         """
@@ -158,6 +165,7 @@ class GPGMail(object):
 
         # signing
         signature = self.gpg.sign(basetxt, detach=True)
+        self.logger.error("signature %s %s" % (basetxt, signature))
 
         # create the new message as multipart/signed (see RFC 3156)
         micalg = "pgp-{}".format(self._get_digest_algo(signature).lower())

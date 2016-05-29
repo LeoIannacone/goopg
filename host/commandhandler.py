@@ -3,6 +3,7 @@ from gpgmail import GPGMail
 from gmail import Gmail
 
 import logging
+from logger import GoopgLogger
 
 VERSION = "0.2.2"
 
@@ -70,7 +71,7 @@ class CommandHandler(object):
             is_multipart = content_type.find('multipart/') >= 0
             if (is_multipart and 'Message-ID' in headers):
                 rfc822msgid = headers['Message-ID']
-                query = '("BEGIN PGP SIGNATURE" "END PGP SIGNATURE")'
+                query = 'filename:asc || filename:gpg || filename:signature || ("BEGIN PGP SIGNATURE" "END PGP SIGNATURE")'
                 match = self.gmail.message_matches(id, query, rfc822msgid)
                 if match:
                     return _verify()

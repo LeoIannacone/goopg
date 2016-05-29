@@ -17,7 +17,10 @@ Depends: python,
          python-gflags,
          python-gnupg,
          python-googleapi,
+         python-oauth2client (>= 2.0.1-1),
          python-xdg,
+         gnupg-agent,
+         gnupg2,
          ${misc:Depends}
 Description: GPG for Gmail - common files
  Goopg is a an extension for Gmail which allows one to verify and sign

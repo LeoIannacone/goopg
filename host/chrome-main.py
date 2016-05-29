@@ -36,7 +36,6 @@ def read_bundle():
 def main():
     """Thread that reads messages from the webapp."""
     GoopgLogger()
-    logger = logging.getLogger('chrome-main')
     handler = CommandHandler()
 
     # a queue to store bundles received before the 'init' command
@@ -66,7 +65,11 @@ def main():
                     parse_and_send_result(bundle)
                 queue = []
 
+logger = logging.getLogger('chrome-main')
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except e:
+        logger.error("General error: {}".format(e.message))
     sys.exit(0)

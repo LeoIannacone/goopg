@@ -11,7 +11,7 @@ class StreamToLogger(object):
     Adapted from: http://bit.ly/1xLpNuF
     """
 
-    def __init__(self, logger, log_level=logging.INFO):
+    def __init__(self, logger, log_level=logging.DEBUG):
         self.logger = logger
         self.log_level = log_level
         self.linebuf = ''

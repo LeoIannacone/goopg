@@ -12,6 +12,7 @@ from oauth2client.tools import run_flow, argparser
 
 from smtplib import SMTP, SMTPServerDisconnected
 from multiprocessing import Process, Queue
+from subprocess import PIPE
 
 from xdg import BaseDirectory
 
@@ -37,10 +38,12 @@ class Gmail():
         self.username = username
         self.http = httplib2.Http()
         self.logger = logging.getLogger('Gmail')
+        self.logger.setLevel(logging.DEBUG)
 
         # Start the OAuth flow to retrieve credentials
         flow = flow_from_clientsecrets(CLIENT_SECRET_FILE,
-                                       scope=OAUTH_SCOPE)
+                                       scope=OAUTH_SCOPE,
+                                       redirect_uri='urn:ietf:wg:oauth:2.0:oob:auto')
 
         # The storage for current user
         storage = Storage(os.path.join(STORAGE_DIR, self.username))
@@ -51,21 +54,23 @@ class Gmail():
         if self.credentials is None or self.credentials.invalid:
             # call a subprocess as workaround for stdin/stdout
             # blocked by the main process, this is the main function:
-            def _subprocess_login():
+            def _subprocess_login(queue, fnstdin):
+                sys.stdin = os.fdopen(fnstdin)
                 sys.stdout = StreamToLogger(self.logger, logging.DEBUG)
                 sys.stderr = StreamToLogger(self.logger, logging.ERROR)
-                queue.put(run_flow(flow, storage, argparser.parse_args([])))
+                queue.put(run_flow(flow, storage, argparser.parse_args(['--auth_host_port', '1234', '--logging_level', 'DEBUG']), self.http))
 
             # A Queue to get the result from subprocess
             queue = Queue()
-            p = Process(target=_subprocess_login)
+            fnstdin = sys.stdin.fileno()
+            p = Process(target=_subprocess_login, args=(queue, fnstdin))
             self.logger.debug("start login process")
             p.start()
             p.join()
             self.logger.debug("end login process")
             # Retrieve the credentials
             self.credentials = queue.get()
-            self.http = self.credentials.authorize(self.http)
+            # self.http = self.credentials.authorize(self.http)
 
         # Access to the Gmail APIs
         self._gmail_API_login()
