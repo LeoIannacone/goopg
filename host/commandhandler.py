@@ -89,7 +89,7 @@ class CommandHandler(object):
             if new_message:
                 self.gmail.send(id, new_message)
                 result = True
-        except Exception, e:
+        except Exception as e:
             self.logger.exception(e)
         finally:
             return result

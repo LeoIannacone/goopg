@@ -43,7 +43,7 @@ def main():
     while 1:
         try:
             bundle = read_bundle()
-        except struct.error, e:
+        except struct.error as e:
             logger.error("Error while reading stdin: \"{}\""
                          " - Exit.".format(e.message))
             sys.exit(1)
@@ -70,6 +70,6 @@ logger = logging.getLogger('chrome-main')
 if __name__ == '__main__':
     try:
         main()
-    except e:
+    except Exception as e:
         logger.error("General error: {}".format(e.message))
     sys.exit(0)
