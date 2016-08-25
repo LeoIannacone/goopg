@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 8),
                python | python-all | python-dev | python-all-dev
 Standards-Version: 3.9.6
 Homepage: http://leoiannacone.github.io/goopg/
-Vcs-Git: git://github.com/LeoIannacone/goopg.git
+Vcs-Git: https://github.com/LeoIannacone/goopg.git
 Vcs-Browser: https://github.com/LeoIannacone/goopg/
 
 Package: goopg-common
