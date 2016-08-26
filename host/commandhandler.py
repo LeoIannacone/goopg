@@ -5,7 +5,7 @@ from gmail import Gmail
 import logging
 from logger import GoopgLogger
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 
 
 class CommandHandler(object):
