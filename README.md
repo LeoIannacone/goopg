@@ -15,9 +15,9 @@ The installation consists in two phases:
  Replace `goopg-chromium` with `goopg-chrome` if you use Chrome.
  
  Eventually, if the repo does not work with you, you can use these packages:
- [goopg-chrome_0.3.1~xenial1_all.deb (2.4 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-chrome_0.3.1~xenial1_all.deb)
- [goopg-chromium_0.3.1~xenial1_all.deb (2.4 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-chromium_0.3.1~xenial1_all.deb)
- [goopg-common_0.3.1~xenial1_all.deb (9.9 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-common_0.3.1~xenial1_all.deb)
+  * [goopg-chrome_0.3.1~xenial1_all.deb (2.4 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-chrome_0.3.1~xenial1_all.deb)
+  * [goopg-chromium_0.3.1~xenial1_all.deb (2.4 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-chromium_0.3.1~xenial1_all.deb)
+  * [goopg-common_0.3.1~xenial1_all.deb (9.9 KiB)](https://launchpad.net/~team-goopg/+archive/ubuntu/goopg/+files/goopg-common_0.3.1~xenial1_all.deb)
 
 
 Open http://gmail.com
