@@ -10,15 +10,19 @@ What you have to do to get it properly installed is:
  ```
  python-googleapi python-gflags python-xdg python-gnupg
 ```
+3. Install coreutils via homebrew (provides `realpath`)
+```
+brew install coreutils
+```
 
-3. Clone this repository:
+4. Clone this repository:
  ```
  git clone https://github.com/LeoIannacone/goopg/
  ```
  Save it somewhere because you will need this files and you cannot remove them.
 
-4. Then install the plugin using this command in the goopg directory:
+5. Then install the plugin using this command in the goopg directory:
  ```
  export TARGET_DIR=~/NativeMessagingHosts
- bash templates/build.sh ifpoaednafmgolabhpjmbimllaoidelg chrome
+ bash templates/build-mac.sh ifpoaednafmgolabhpjmbimllaoidelg chrome
  ```
